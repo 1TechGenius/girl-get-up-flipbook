@@ -1,32 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Girl, Get Up! Flipbook</title>
-  <link rel="stylesheet" href="dflip_bundle/dflip.min.css">
+  <link rel="stylesheet" href="dflip.min.css">
   <style>
     body {
       margin: 0;
-      background: #f9f9f9;
+      background: #f7f7f7;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
-    .df-container {
+    #flipbookContainer {
       width: 90%;
-      height: 90vh;
+      max-width: 1000px;
     }
   </style>
 </head>
 <body>
-  <div class="df-container" id="flipbook"
-       source="Girl-Get-Up-Flipbook.pdf"
-       id="df_manual"
-       class="df-flipbook df-fade-light"
-       style="width:100%;height:100%;">
-  </div>
+  <div id="flipbookContainer" class="df-flip-book" source="Girl-Get-Up-Flipbook.pdf" id="myFlipbook" style="height: 600px;"></div>
 
-  <script src="dflip_bundle/dflip.min.js"></script>
+  <script src="dflip.min.js"></script>
 </body>
 </html>
