@@ -3,23 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <title>Girl, Get Up! Flipbook</title>
-  <link rel="stylesheet" href="dflip.min.css">
-  <script src="dflip.min.js"></script>
+  <link rel="stylesheet" href="assets/dflip.min.css">
   <style>
     body {
       margin: 0;
       padding: 0;
       background: #f9f9f9;
     }
+    .flipbook-container {
+      width: 100%;
+      height: 100vh;
+    }
   </style>
 </head>
 <body>
+  <div class="flipbook-container" id="flipbook"></div>
 
-  <div class="df-flipbook" 
-       data-dflip-source="Girl-Get-Up-Flipbook.pdf"
-       data-dflip-width="100%" 
-       data-dflip-height="100vh">
-  </div>
-
+  <script src="assets/dflip.min.js"></script>
+  <script>
+    var flipbook = new DFLIP({
+      source: "Girl-Get-Up-Flipbook.pdf",
+      backgroundColor: "#ffffff",
+      webgl: true,
+      height: "100%",
+      enableSound: true
+    }, document.getElementById("flipbook"));
+  </script>
 </body>
 </html>
