@@ -1,31 +1,35 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Girl, Get Up! Flipbook</title>
   <link rel="stylesheet" href="dflip.min.css" />
   <style>
     body {
       margin: 0;
-      background: #f5f5f5;
+      background-color: #f9f9f9;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
     }
+
     #flipbookContainer {
       width: 90%;
-      max-width: 900px;
-      height: 600px;
+      max-width: 1000px;
+      height: 700px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
     }
   </style>
 </head>
 <body>
-  <div class="df-container" id="flipbookContainer"
-       source="Girl-Get-Up-Flipbook.pdf"
-       thumb="assets/thumb.jpg"
-       backgroundcolor="#ffffff">
-  </div>
+  <div id="flipbookContainer" class="df-flip-book" 
+       source="Girl-Get-Up-Flipbook.pdf" 
+       id="df_manual" 
+       webgl="true"
+       backgroundcolor="#ffffff" 
+       page-mode="double" 
+       controls-position="bottom"></div>
 
   <script src="dflip.min.js"></script>
 </body>
