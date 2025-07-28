@@ -1,20 +1,47 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title>Flipbook Viewer</title>
-    <style>
-      html, body {
-        margin: 0;
-        height: 100%;
-      }
-      iframe {
-        border: none;
-        width: 100%;
-        height: 100vh;
-      }
-    </style>
-  </head>
-  <body>
-    <iframe src="Girl-Get-Up-Flipbook.pdf#toolbar=0&navpanes=0&scrollbar=0"></iframe>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Girl, Get Up! Flipbook</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/stpageflip@2.0.4/css/stpageflip.min.css" />
+  <style>
+    body {
+      margin: 0;
+      background: #f9f9f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    #flipbookContainer {
+      width: 90%;
+      max-width: 1000px;
+      height: 700px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      background: white;
+    }
+  </style>
+</head>
+<body>
+  <div id="flipbookContainer"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.4.120/build/pdf.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stpageflip@2.0.4/dist/stpageflip.min.js"></script>
+  <script>
+    const flipbook = new St.PageFlip(document.getElementById('flipbookContainer'), {
+      width: 500,
+      height: 700,
+      size: 'stretch',
+      minWidth: 315,
+      maxWidth: 1000,
+      minHeight: 420,
+      maxHeight: 1350,
+      maxShadowOpacity: 0.3,
+      showCover: true,
+      mobileScrollSupport: false
+    });
+
+    flipbook.loadFromPDF('Girl-Get-Up-Flipbook.pdf');
+  </script>
+</body>
 </html>
