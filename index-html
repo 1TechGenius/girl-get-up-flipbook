@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Girl, Get Up! Flipbook</title>
-  <link rel="stylesheet" href="dflip.min.css">
-  <style>
-    body {
-      margin: 0;
-      background: #f7f7f7;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    #flipbookContainer {
-      width: 90%;
-      max-width: 1000px;
-    }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- DearFlip CSS -->
+  <link rel="stylesheet" href="dflip.min.css" />
 </head>
-<body>
-  <div id="flipbookContainer" class="df-flip-book" source="Girl-Get-Up-Flipbook.pdf" id="myFlipbook" style="height: 600px;"></div>
+<body style="margin: 0; background: #eeeeee;">
 
+  <!-- Flipbook -->
+  <dflip-book 
+    source="Girl-Get-Up-Flipbook.pdf"
+    id="flipbook"
+    backgroundcolor="#eeeeee"
+    webgl="true"
+    style="width: 100%; height: 100vh;">
+  </dflip-book>
+
+  <!-- DearFlip JS -->
   <script src="dflip.min.js"></script>
+
 </body>
 </html>
+
