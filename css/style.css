@@ -1,0 +1,13 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  background-color: #fdfdfd;
+  font-family: sans-serif;
+}
+
+#flipbook-container {
+  width: 100%;
+  height: 100vh;
+  overflow: hidden;
+}
