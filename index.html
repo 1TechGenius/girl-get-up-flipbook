@@ -2,14 +2,59 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Girl, Get Up! Flipbook</title>
-  <link rel="stylesheet" href="./css/style.css" />
+
+  <!-- Flipbook CSS -->
+  <link rel="stylesheet" href="css/dflip.css" />
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden; /* No scroll bar */
+      height: 100%;
+      background-color: #ffffff;
+    }
+
+    #flipbookContainer {
+      width: 100%;
+      height: 100vh;
+    }
+  </style>
 </head>
 <body>
-  <div id="flipbook-container"></div>
+  <!-- Flipbook container -->
+  <div id="flipbookContainer"></div>
 
-  <script src="./libs/pageflip.min.js"></script>
-  <script src="./js/main.js"></script>
+  <!-- Flipbook JS -->
+  <script src="js/pageflip.min.js"></script>
+
+  <script>
+    const flipbook = new St.PageFlip(
+      document.getElementById("flipbookContainer"),
+      {
+        width: 800,
+        height: 600,
+        size: "stretch",
+        minWidth: 315,
+        maxWidth: 1600,
+        minHeight: 400,
+        maxHeight: 1500,
+        showCover: true,
+        mobileScrollSupport: false,
+        usePortrait: false,
+        swipeDistance: 30,
+        showPageCorners: true,
+        disableFlipByClick: false,
+        useMouseEvents: true,
+        useKeyboard: true,
+        responsive: true,
+      }
+    );
+
+    flipbook.loadFromPDF("Girl-Get-Up-Flipbook.pdf");
+  </script>
 </body>
 </html>
+
