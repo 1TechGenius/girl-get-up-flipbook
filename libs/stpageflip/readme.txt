@@ -1,0 +1,1 @@
+Manual install of StPageFlip. Drop into public/libs/stpageflip/
