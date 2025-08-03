@@ -2,63 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Flipbook Viewer</title>
-  
-  <!-- Updated CSS link -->
-  <link rel="stylesheet" href="css/pageflip.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip/dist/page-flip.browser.min.css"/>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 2rem;
+      margin: 0;
+      background-color: #fff;
+    }
+    #flipbookContainer {
+      display: none;
+      margin-top: 3rem;
+    }
+    #flipbook {
+      width: 100%;
+      max-width: 900px;
+      height: 80vh;
+      margin: auto;
+    }
+    input, button {
+      margin-top: 1rem;
+    }
+    .access-form {
+      margin-top: 3rem;
+    }
+  </style>
 </head>
 <body>
-  <h2>Enter Access Code</h2>
-  <input type="text" id="accessCodeInput" placeholder="Enter your unique code"
-         style="padding:0.6rem 1rem; font-size:1rem; border:1px solid #ccc; border-radius:5px; width:250px;" />
-  <br /><br />
-  <button 
-    onclick="validateAccessCode()"
-    style="padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #111; color: #fff; border: none; border-radius: 5px; cursor: pointer;">
-    Unlock Flipbook
-  </button>
-  <p id="errorMsg" style="color:red; display:none;">Invalid code. Please try again.</p>
 
-  <div id="flipbookContainer" style="display: none; margin-top:30px;">
-    <div id="flipbook" style="width: 100%; height: 800px;"></div>
+  <h1 style="font-size: 1.8rem;">Enter Your Unique Code</h1>
+
+  <div class="access-form">
+    <input 
+      type="text" 
+      id="accessCodeInput" 
+      placeholder="Enter your unique code"
+      style="padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; width: 250px;"
+    />
+    <br/>
+    <button 
+      onclick="validateAccessCode()"
+      style="padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #111; color: #fff; border: none; border-radius: 5px; cursor: pointer;"
+    >
+      Unlock Flipbook
+    </button>
+    <p id="errorMessage" style="color: red; margin-top: 1rem; display: none;">
+      Invalid code. Please try again.
+    </p>
   </div>
 
-  <!-- Updated JS reference -->
-  <script src="libs/pageflip.min.js"></script>
+  <div id="flipbookContainer">
+    <div id="flipbook"></div>
+  </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/page-flip/dist/page-flip.browser.min.js"></script>
   <script>
     function validateAccessCode() {
-      const inputCode = document.getElementById("accessCodeInput").value;
       const correctCode = "GGU2023ACCESS";
-      const errorMsg = document.getElementById("errorMsg");
-      const container = document.getElementById("flipbookContainer");
+      const userInput = document.getElementById("accessCodeInput").value.trim();
+      const errorMsg = document.getElementById("errorMessage");
 
-      if (inputCode === correctCode) {
+      if (userInput === correctCode) {
         errorMsg.style.display = "none";
-        container.style.display = "block";
-
-        const flipbook = new St.PageFlip(document.getElementById("flipbook"), {
-          width: 550,
-          height: 733,
-          size: "stretch",
-          minWidth: 315,
-          maxWidth: 2000,
-          minHeight: 400,
-          maxHeight: 2000,
-          maxShadowOpacity: 0.5,
-          showCover: true,
-          mobileScrollSupport: true,
-          useMouseEvents: true,
-        });
-
-        // ✅ Load your actual PDF from Hostinger upload
-        flipbook.loadFromPDF("https://assets.zyrosite.com/A3QOQlw2ewfbBvRv/girl-get-up-flipbook-mxBXVvZGjRuoJ9Oq.pdf");
+        loadFlipbook();
       } else {
         errorMsg.style.display = "block";
-        container.style.display = "none";
       }
     }
+
+    function loadFlipbook() {
+      const container = document.getElementById("flipbookContainer");
+      container.style.display = "block";
+
+      const pageFlip = new St.PageFlip(
+        document.getElementById("flipbook"),
+        {
+          width: 600,
+          height: 800,
+          size: "stretch",
+          minWidth: 315,
+          maxWidth: 1000,
+          minHeight: 400,
+          maxHeight: 1536,
+          drawShadow: true,
+          flippingTime: 1000,
+          useMouseEvents: true,
+          showPageCorners: true,
+          disableFlipByClick: false,
+          showCover: true,
+          mobileScrollSupport: false,
+          useKeyboard: true,
+          responsive: true
+        }
+      );
+
+      pageFlip.loadFromPDF("https://assets.zyrosite.com/A3QOQlw2ewfbBvRv/girl-get-up-flipbook-mxBXVvZGjRuoJ9Oq.pdf");
+    }
   </script>
+
 </body>
 </html>
