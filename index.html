@@ -5,129 +5,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Girl, Get Up! Flipbook</title>
 
-  <!-- Flipbook CSS -->
-  <link rel="stylesheet" href="css/dflip.css" />
-
-  <style>
-    html, body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden; /* No scroll bar */
-      height: 100%;
-      background-color: #ffffff;
-    }
-
-    #flipbookContainer {
-      width: 100%;
-      height: 100vh;
-    }
-  </style>
+  <!-- PageFlip Styles -->
+  <link rel="stylesheet" href="/libs/stpageflip/css/pageflip.css" />
 </head>
-<body>
-  <!-- Flipbook container -->
-  <div id="flipbookContainer"></div>
+<body style="font-family: Arial, sans-serif; text-align: center; padding: 2rem;">
 
-  <!-- Flipbook JS -->
-  <script src="js/pageflip.min.js"></script>
+  <h1 style="font-size: 2rem; margin-bottom: 1rem;">Enter Your Unique Code to Unlock the Flipbook</h1>
 
-  <script>
-    const flipbook = new St.PageFlip(
-      document.getElementById("flipbookContainer"),
-      {
-        width: 800,
-        height: 600,
-        size: "stretch",
-        minWidth: 315,
-        maxWidth: 1600,
-        minHeight: 400,
-        maxHeight: 1500,
-        showCover: true,
-        mobileScrollSupport: false,
-        usePortrait: false,
-        swipeDistance: 30,
-        showPageCorners: true,
-        disableFlipByClick: false,
-        useMouseEvents: true,
-        useKeyboard: true,
-        responsive: true,
-      }
-    );
-
-    flipbook.loadFromPDF("Girl-Get-Up-Flipbook.pdf");
-  </script>
-</body>
-</html>
-<!-- Second Gate: Code Verification -->
-<section style="margin-top: 2rem; text-align: center;">
-  <h2>Enter Your Access Code</h2>
-  <p style="margin-bottom: 1rem;">This code was sent to the email address used at checkout.</p>
-  
+  <!-- Code Entry UI -->
   <input 
     type="text" 
     id="accessCodeInput" 
     placeholder="Enter your unique code"
     style="padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; width: 250px;"
   />
-  
-  <br /><br />
   <button 
     onclick="validateAccessCode()"
     style="padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #111; color: #fff; border: none; border-radius: 5px; cursor: pointer;"
   >
     Unlock Flipbook
   </button>
-
   <p id="errorMessage" style="color: red; margin-top: 1rem; display: none;">Invalid code. Please try again.</p>
-</section>
 
-<script>
-  function validateAccessCode() {
-  const correctCode = "GGU2023ACCESS";
-  const userInput = document.getElementById("accessCodeInput").value;
-  const errorMsg = document.getElementById("errorMessage");
+  <!-- Flipbook Container -->
+  <div id="flipbookContainer" style="display: none; margin-top: 3rem; text-align: center;">
+    <div id="flipbook" style="width: 90%; height: 80vh; margin: auto;"></div>
+  </div>
 
-  if (userInput === correctCode) {
-    errorMsg.style.display = "none";
-    loadFlipbook(); // 👈 Load the flipbook right on the same page
-  } else {
-    errorMsg.style.display = "block";
-  }
-}
+  <!-- PageFlip Scripts -->
+  <script src="/libs/stpageflip/js/pageflip.min.js"></script>
+  <script>
+    function validateAccessCode() {
+      const correctCode = "GGU2023ACCESS"; // <- Your actual code
+      const userInput = document.getElementById("accessCodeInput").value;
+      const errorMsg = document.getElementById("errorMessage");
 
-</script>
-<!-- Flipbook Container -->
-<div id="flipbookContainer" style="display: none; margin-top: 3rem; text-align: center;">
-  <div id="flipbook" style="width: 90%; height: 80vh; margin: auto;"></div>
-</div>
+      if (userInput === correctCode) {
+        errorMsg.style.display = "none";
+        loadFlipbook(); // Load flipbook on same page
+      } else {
+        errorMsg.style.display = "block";
+      }
+    }
 
-<!-- PageFlip Script -->
-<script src="libs/stpageflip/js/pageflip.min.js"></script>
-<link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
-<script>
-  function loadFlipbook() {
-    const flipbookContainer = document.getElementById("flipbookContainer");
-    flipbookContainer.style.display = "block";
+    function loadFlipbook() {
+      const flipbookContainer = document.getElementById("flipbookContainer");
+      flipbookContainer.style.display = "block";
 
-    const flipbook = new St.PageFlip(document.getElementById("flipbook"), {
-      width: 600,
-      height: 800,
-      size: "stretch",
-      minWidth: 315,
-      maxWidth: 1000,
-      minHeight: 400,
-      maxHeight: 1536,
-      showCover: true,
-      drawShadow: true,
-      flippingTime: 1000,
-      mobileScrollSupport: false,
-      useMouseEvents: true,
-      disableFlipByClick: false,
-      showPageCorners: true,
-      useKeyboard: true,
-      responsive: true
-    });
+      const flipbook = new St.PageFlip(document.getElementById("flipbook"), {
+        width: 600,
+        height: 800,
+        size: "stretch",
+        minWidth: 315,
+        maxWidth: 1000,
+        minHeight: 400,
+        maxHeight: 1536,
+        showCover: true,
+        drawShadow: true,
+        flippingTime: 1000,
+        mobileScrollSupport: false,
+        useMouseEvents: true,
+        disableFlipByClick: false,
+        showPageCorners: true,
+        useKeyboard: true,
+        responsive: true
+      });
 
-    flipbook.loadFromPDF("Girl-Get-Up-Flipbook.pdf");
-  }
-  
+      flipbook.loadFromPDF("Girl-Get-Up-Flipbook.pdf");
+    }
+  </script>
+</body>
+</html>
 
