@@ -2,71 +2,66 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Flipbook Viewer</title>
+  <meta 
+    name="viewport" 
+    content="width=device-width, initial-scale=1.0" 
+  />
+  <title>Girl, Get Up! Flipbook</title>
+
   <!-- STPageFlip CSS -->
-  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
+  <link 
+    rel="stylesheet" 
+    href="libs/stpageflip/css/pageflip.css" 
+  />
+  <!-- Your custom styles, if any -->
+  <link 
+    rel="stylesheet" 
+    href="css/style.css" 
+  />
 </head>
-<body style="font-family:sans-serif; text-align:center; padding:2rem;">
+<body style="font-family:sans-serif; text-align:center;">
 
-  <!-- ACCESS CODE ENTRY -->
-  <h2>Enter Access Code</h2>
-  <input id="accessCodeInput" type="text" placeholder="Enter your unique code"
-         style="padding:.6rem 1rem;font-size:1rem;border:1px solid #ccc;border-radius:5px;width:250px;"/>
-  <br><br>
-  <button onclick="validateAccessCode()"
-          style="padding:.6rem 1.5rem;font-size:1rem;background:#111;color:#fff;border:none;border-radius:5px;cursor:pointer;">
-    Unlock Flipbook
-  </button>
-  <p id="errorMessage" style="color:red;margin-top:1rem;display:none;">
-    Invalid code. Please try again.
-  </p>
+  <h1 style="margin:2rem 0">Girl, Get Up! Flipbook</h1>
 
-  <!-- FLIPBOOK CONTAINER (hidden until code is correct) -->
-  <div id="flipbookContainer" style="display:none;margin-top:3rem;">
-    <div id="flipbook" style="width:90%;height:80vh;margin:auto;"></div>
-  </div>
+  <!-- Flipbook Container -->
+  <div 
+    id="flipbookContainer" 
+    style="width:90%; max-width:800px; height:80vh; margin:auto"
+  ></div>
 
   <!-- STPageFlip JS -->
   <script src="libs/stpageflip/js/pageflip.min.js"></script>
+  <!-- Your app logic -->
   <script>
-    function validateAccessCode() {
-      const correctCode = "GGU2023ACCESS";
-      const userInput    = document.getElementById("accessCodeInput").value.trim();
-      const errorMsg     = document.getElementById("errorMessage");
-
-      if (userInput === correctCode) {
-        errorMsg.style.display = "none";
-        loadFlipbook();
-      } else {
-        errorMsg.style.display = "block";
-      }
-    }
-
-    function loadFlipbook() {
-      const container = document.getElementById("flipbookContainer");
-      container.style.display = "block";
-
+    document.addEventListener("DOMContentLoaded", () => {
       const flipbook = new St.PageFlip(
-        document.getElementById("flipbook"),
-        {
-          width: 600, height: 800,
+        document.getElementById("flipbookContainer"), {
+          width: 600,
+          height: 800,
           size: "stretch",
-          minWidth: 315, maxWidth: 1000,
-          minHeight: 400, maxHeight: 1536,
-          showCover: true, drawShadow: true,
-          flippingTime: 1000, mobileScrollSupport: false,
-          useMouseEvents: true, disableFlipByClick: false,
-          showPageCorners: true, useKeyboard: true,
+          minWidth: 315,
+          maxWidth: 1000,
+          minHeight: 400,
+          maxHeight: 1536,
+          showCover: true,
+          drawShadow: true,
+          flippingTime: 1000,
+          mobileScrollSupport: false,
+          useMouseEvents: true,
+          disableFlipByClick: false,
+          showPageCorners: true,
+          useKeyboard: true,
           responsive: true
         }
       );
 
-      // Update this path if you ever self-host the PDF:
+      // adjust this path to wherever your PDF actually lives:
+      // local:     "pdf/Girl-Get-Up-Flipbook.pdf"
+      // github/Vercel: "/Girl-Get-Up-Flipbook.pdf"
+      // external URL:
+      // "https://assets.zyrosite.com/A3QOQlw2ewfbBvRv/girl-get-up-flipbook-mxBXVvZGjRuoJ9Oq.pdf"
       flipbook.loadFromPDF("pdf/Girl-Get-Up-Flipbook.pdf");
-      // — or point directly to your Hostinger asset URL:
-      // flipbook.loadFromPDF("https://assets.zyrosite.com/.../girl-get-up-flipbook.pdf");
-    }
+    });
   </script>
 </body>
 </html>
