@@ -3,28 +3,27 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Girl, Get Up! Flipbook</title>
-
-  <!-- PageFlip Styles -->
-  <link rel="stylesheet" href="/libs/stpageflip/css/pageflip.css" />
+  <title>Girl Get Up Flipbook</title>
+  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
 </head>
-<body style="font-family: Arial, sans-serif; text-align: center; padding: 2rem;">
+<body style="font-family: sans-serif; text-align: center; padding: 2rem;">
 
-  <h1 style="font-size: 2rem; margin-bottom: 1rem;">Enter Your Unique Code to Unlock the Flipbook</h1>
+  <h1 style="margin-bottom: 1rem;">Enter Access Code</h1>
 
-  <!-- Code Entry UI -->
   <input 
     type="text" 
     id="accessCodeInput" 
     placeholder="Enter your unique code"
     style="padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; width: 250px;"
   />
+
   <button 
     onclick="validateAccessCode()"
     style="padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #111; color: #fff; border: none; border-radius: 5px; cursor: pointer;"
   >
     Unlock Flipbook
   </button>
+
   <p id="errorMessage" style="color: red; margin-top: 1rem; display: none;">Invalid code. Please try again.</p>
 
   <!-- Flipbook Container -->
@@ -32,17 +31,18 @@
     <div id="flipbook" style="width: 90%; height: 80vh; margin: auto;"></div>
   </div>
 
-  <!-- PageFlip Scripts -->
-  <script src="/libs/stpageflip/js/pageflip.min.js"></script>
+  <!-- Scripts -->
+  <script src="libs/stpageflip/js/pageflip.min.js"></script>
+
   <script>
     function validateAccessCode() {
-      const correctCode = "GGU2023ACCESS"; // <- Your actual code
+      const correctCode = "GGU2023ACCESS";
       const userInput = document.getElementById("accessCodeInput").value;
       const errorMsg = document.getElementById("errorMessage");
 
       if (userInput === correctCode) {
         errorMsg.style.display = "none";
-        loadFlipbook(); // Load flipbook on same page
+        loadFlipbook();
       } else {
         errorMsg.style.display = "block";
       }
@@ -76,4 +76,3 @@
   </script>
 </body>
 </html>
-
