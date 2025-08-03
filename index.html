@@ -57,4 +57,40 @@
   </script>
 </body>
 </html>
+<!-- Second Gate: Code Verification -->
+<section style="margin-top: 2rem; text-align: center;">
+  <h2>Enter Your Access Code</h2>
+  <p style="margin-bottom: 1rem;">This code was sent to the email address used at checkout.</p>
+  
+  <input 
+    type="text" 
+    id="accessCodeInput" 
+    placeholder="Enter your unique code"
+    style="padding: 0.6rem 1rem; font-size: 1rem; border: 1px solid #ccc; border-radius: 5px; width: 250px;"
+  />
+  
+  <br /><br />
+  <button 
+    onclick="validateAccessCode()"
+    style="padding: 0.6rem 1.5rem; font-size: 1rem; background-color: #111; color: #fff; border: none; border-radius: 5px; cursor: pointer;"
+  >
+    Unlock Flipbook
+  </button>
+
+  <p id="errorMessage" style="color: red; margin-top: 1rem; display: none;">Invalid code. Please try again.</p>
+</section>
+
+<script>
+  function validateAccessCode() {
+    const correctCode = "GGU2025ACCESS"; // <-- Update this as needed
+    const userInput = document.getElementById("accessCodeInput").value.trim();
+    const errorMsg = document.getElementById("errorMessage");
+
+    if (userInput === correctCode) {
+      window.location.href = "https://giablessings.com/flipbook-viewer";
+    } else {
+      errorMsg.style.display = "block";
+    }
+  }
+</script>
 
