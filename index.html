@@ -82,15 +82,56 @@
 
 <script>
   function validateAccessCode() {
-    const correctCode = "GGU2025ACCESS"; // <-- Update this as needed
-    const userInput = document.getElementById("accessCodeInput").value.trim();
-    const errorMsg = document.getElementById("errorMessage");
+  const correctCode = "GGU2023ACCESS";
+  const userInput = document.getElementById("accessCodeInput").value;
+  const errorMsg = document.getElementById("errorMessage");
 
-    if (userInput === correctCode) {
-      window.location.href = "https://giablessings.com/flipbook-viewer";
-    } else {
-      errorMsg.style.display = "block";
-    }
+  if (userInput === correctCode) {
+    errorMsg.style.display = "none";
+    loadFlipbook(); // 👈 Load the flipbook right on the same page
+  } else {
+    errorMsg.style.display = "block";
   }
+}
+
+</script>
+<!-- Flipbook Container -->
+<div id="flipbookContainer" style="display: none; margin-top: 3rem; text-align: center;">
+  <div id="flipbook" style="width: 90%; height: 80vh; margin: auto;"></div>
+</div>
+
+<!-- PageFlip Script -->
+<script src="libs/stpageflip/js/pageflip.min.js"></script>
+<link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
+<script>
+  function loadFlipbook() {
+    const flipbookContainer = document.getElementById("flipbookContainer");
+    flipbookContainer.style.display = "block";
+
+    const flipbook = new St.PageFlip(document.getElementById("flipbook"), {
+      width: 600,
+      height: 800,
+      size: "stretch",
+      minWidth: 315,
+      maxWidth: 1000,
+      minHeight: 400,
+      maxHeight: 1536,
+      showCover: true,
+      drawShadow: true,
+      flippingTime: 1000,
+      mobileScrollSupport: false,
+      useMouseEvents: true,
+      disableFlipByClick: false,
+      showPageCorners: true,
+      useKeyboard: true,
+      responsive: true
+    });
+
+    flipbook.loadFromPDF("Girl-Get-Up-Flipbook.pdf");
+  }
+  <!-- Hidden Flipbook Container -->
+<div id="flipbookWrapper" style="display: none; margin-top: 2rem;">
+  <div id="flipbookContainer" style="width: 100%; height: 80vh;"></div>
+</div>
 </script>
 
