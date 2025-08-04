@@ -5,17 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Girl, Get Up! Flipbook</title>
 
-  <!-- STPageFlip stylesheet -->
-  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
+  <!-- STPageFlip CSS -->
+  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css"/>
+
   <style>
     body {
       font-family: sans-serif;
-      margin: 0;
-      padding: 2rem;
       text-align: center;
-    }
-    #accessSection {
-      margin-top: 4rem;
+      padding: 2rem;
     }
     #accessCodeInput {
       padding: 0.6rem 1rem;
@@ -24,7 +21,7 @@
       border-radius: 5px;
       width: 250px;
     }
-    #unlockBtn {
+    #unlockButton {
       margin-top: 1rem;
       padding: 0.6rem 1.5rem;
       font-size: 1rem;
@@ -34,10 +31,12 @@
       border-radius: 5px;
       cursor: pointer;
     }
+    /* Hide the flipbook until “Unlock” is clicked */
     #flipbookContainer {
       display: none;
       margin-top: 3rem;
     }
+    /* Make the flipbook fill its container */
     #flipbook {
       width: 90%;
       height: 80vh;
@@ -45,51 +44,44 @@
     }
   </style>
 </head>
+
 <body>
 
-  <h1>Girl, Get Up! Flipbook</h1>
+  <!-- GATE UI -->
+  <h2>Enter Access Code</h2>
+  <input
+    type="text"
+    id="accessCodeInput"
+    placeholder="Enter your unique code"
+  /><br/>
+  <button id="unlockButton" onclick="loadFlipbook()">
+    Unlock Flipbook
+  </button>
 
-  <div id="accessSection">
-    <h2>Enter Access Code</h2>
-    <input
-      type="text"
-      id="accessCodeInput"
-      placeholder="Enter your unique code"
-    />
-    <br/>
-    <button id="unlockBtn">Unlock Flipbook</button>
-    <p id="errorMessage" style="color: red; display: none;">
-      Invalid code—please try again.
-    </p>
-  </div>
-
+  <!-- FLIPBOOK -->
   <div id="flipbookContainer">
     <div id="flipbook"></div>
   </div>
 
-  <!-- STPageFlip script -->
+  <!-- STPageFlip JS -->
   <script src="libs/stpageflip/js/pageflip.min.js"></script>
   <script>
-    // NOTE: placeholder only—SamCart will handle real codes later
-    document.getElementById('unlockBtn').addEventListener('click', () => {
-      const input = document.getElementById('accessCodeInput').value.trim();
-      if (!input) {
-        document.getElementById('errorMessage').textContent = 'Please enter your code.';
-        document.getElementById('errorMessage').style.display = 'block';
-        return;
-      }
-      // hide the gate UI:
-      document.getElementById('accessSection').style.display = 'none';
-      // show the flipbook:
-      document.getElementById('flipbookContainer').style.display = 'block';
+    function loadFlipbook() {
+      // 1) Hide the gate UI
+      document.getElementById('accessCodeInput').style.display = 'none';
+      document.getElementById('unlockButton').style.display = 'none';
 
-      // initialize STPageFlip:
+      // 2) Show the flipbook
+      const wrapper = document.getElementById('flipbookContainer');
+      wrapper.style.display = 'block';
+
+      // 3) Instantiate and load your PDF
       const flipbook = new St.PageFlip(
         document.getElementById('flipbook'),
         {
           width: 600,
           height: 800,
-          size: 'stretch',
+          size: "stretch",
           minWidth: 315,
           maxWidth: 1000,
           minHeight: 400,
@@ -106,9 +98,11 @@
         }
       );
 
-      // load your PDF from the local pdf folder:
-      flipbook.loadFromPDF('pdf/Girl-Get-Up-Flipbook.pdf');
-    });
+      // **<— UPDATE THIS** to your actual externally-hosted PDF:
+      flipbook.loadFromPDF(
+        "https://assets.zyrosite.com/A3QOQlw2ewfbBvRv/girl-get-up-flipbook-mxBXVvZGjRuoJ9Oq.pdf"
+      );
+    }
   </script>
 </body>
 </html>
