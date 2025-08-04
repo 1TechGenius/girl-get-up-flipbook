@@ -4,104 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Girl, Get Up! Flipbook</title>
-  <!-- PageFlip CSS -->
   <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
   <style>
-    body {
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-    #flipbookContainer {
-      display: none;
-      margin-top: 2rem;
-    }
-    #flipbook {
-      width: 100%;
-      height: 80vh;
-
-        margin: auto;
-       box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    #unlockButton {
-      margin-left: 1rem;
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      background: #111;
-      color: #fff;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    #accessCodeInput {
-      padding: 0.6rem 1rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 250px;
-    }
-    #errorMessage {
-      color: red;
-      margin-top: 1rem;
-      display: none;
-    }
+    body { font-family:sans-serif; text-align:center; padding:2rem; }
+    #accessCodeInput { padding:0.6rem 1rem; font-size:1rem; border:1px solid #ccc; border-radius:5px; width:250px; }
+    #unlockButton { margin-top:1rem; padding:0.6rem 1.5rem; font-size:1rem; background:#111; color:#fff; border:none; border-radius:5px; cursor:pointer; }
+    #errorMessage { color:red; margin-top:1rem; display:none; }
+    /* hide until unlocked */
+    #flipbookContainer { display:none; margin-top:3rem; text-align:center; }
+    #flipbook { width:90%; height:80vh; margin:auto; }
   </style>
 </head>
 <body>
+
   <h1>Enter Access Code</h1>
   <input id="accessCodeInput" placeholder="Enter your unique code" />
+  <br/>
   <button id="unlockButton" onclick="validateAccessCode()">Unlock Flipbook</button>
-  <p id="errorMessage">Invalid code. Please try again.</p>
+  <p id="errorMessage">Please enter a code.</p>
 
   <div id="flipbookContainer">
     <div id="flipbook"></div>
   </div>
 
-  <!-- PageFlip JS -->
   <script src="libs/stpageflip/js/pageflip.min.js"></script>
   <script>
     function validateAccessCode() {
-      // placeholder only—SamCart will handle real codes
-      const userInput = document.getElementById('accessCodeInput').value;
-      if (!userInput) {
-        document.getElementById('errorMessage').style.display = 'block';
-        return;
+      const code = document.getElementById('accessCodeInput').value.trim();
+      if (!code) {
+        return document.getElementById('errorMessage').style.display = 'block';
       }
-      // hide gate UI
-      document.getElementById('accessCodeInput').style.display = 'none';
-      document.getElementById('unlockButton').style.display = 'none';
       document.getElementById('errorMessage').style.display = 'none';
-      // show flipbook & load PDF
       loadFlipbook();
     }
 
     function loadFlipbook() {
-      document.getElementById('flipbookContainer').style.display = 'block';
+      // hide gate UI
+      document.getElementById('accessCodeInput').style.display = 'none';
+      document.getElementById('unlockButton').style.display = 'none';
 
-      const flipbook = new St.PageFlip(
-        document.getElementById('flipbook'),
-        {
-          width: 600,
-          height: 800,
-          size: 'stretch',
-          minWidth: 315,
-          maxWidth: 1000,
-          minHeight: 400,
-          maxHeight: 1536,
-          showCover: true,
-          drawShadow: true,
-          flippingTime: 1000,
-          mobileScrollSupport: false,
-          useMouseEvents: true,
-          disableFlipByClick: false,
-          showPageCorners: true,
-          useKeyboard: true,
-          responsive: true
-        }
-      );
+      // show flipbook container
+      const container = document.getElementById('flipbookContainer');
+      container.style.display = 'block';
 
-      // always pull from THIS local PDF
-      flipbook.loadFromPDF('Girl-Get-Up-Flipbook.pdf');
+      // measure actual size
+      const flipbookEl = document.getElementById('flipbook');
+      const width  = flipbookEl.clientWidth;
+      const height = flipbookEl.clientHeight;
+
+      // instantiate
+      const flipbook = new St.PageFlip(flipbookEl, {
+        width, height,
+        size:       'stretch',
+        minWidth:   315,
+        maxWidth:   2000,
+        minHeight:  400,
+        maxHeight:  2000,
+        showCover:  true,
+        drawShadow: true,
+        flippingTime:      1000,
+        mobileScrollSupport: false,
+        useMouseEvents:    true,
+        disableFlipByClick: false,
+        showPageCorners:   true,
+        useKeyboard:       true,
+        responsive:        true
+      });
+
+      // **this** must match your committed folder!  
+      flipbook.loadFromPDF('/pdf/Girl-Get-Up-Flipbook.pdf');
     }
   </script>
 </body>
