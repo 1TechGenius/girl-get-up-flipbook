@@ -2,107 +2,106 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Girl, Get Up! Flipbook</title>
 
-  <!-- PageFlip CSS -->
-  <link rel="stylesheet" href="/libs/stpageflip/css/pageflip.css" />
+  <!-- STPageFlip CSS -->
+  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css"/>
 
   <style>
     body {
       font-family: sans-serif;
       text-align: center;
-      padding: 2rem;
       margin: 0;
+      padding: 2rem;
+    }
+
+    /* Gate */
+    #gate {
+      max-width: 400px;
+      margin: 0 auto 2rem;
     }
     #accessCodeInput {
-      padding: 0.6rem 1rem;
+      width: 100%;
+      padding: .5rem;
       font-size: 1rem;
       border: 1px solid #ccc;
-      border-radius: 5px;
-      width: 250px;
+      border-radius: 4px;
     }
     #unlockButton {
       margin-top: 1rem;
-      padding: 0.6rem 1.5rem;
+      padding: .6rem 1.2rem;
       font-size: 1rem;
       background-color: #111;
       color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
     }
-    #errorMessage {
-      color: red;
-      margin-top: 1rem;
-      display: none;
-    }
-    /* keep the flipbook DIV hidden until “Unlock” */
+
+    /* Flipbook container (hidden until unlocked) */
     #flipbookContainer {
       display: none;
-      margin-top: 2rem;
-    }
-    /* make flipbook fill its wrapper */
-    #flipbook {
       width: 100%;
       height: 80vh;
-      margin: auto;
-      /* optional: drop-shadow behind pages */
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      margin: 0 auto;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2); /* optional shadow */
+    }
+    #flipbook {
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 
 <body>
-  <!-- GATE UI -->
-  <h2>Enter Access Code</h2>
-  <input id="accessCodeInput" placeholder="Enter your unique code" />
-  <br />
-  <button id="unlockButton" onclick="validateAccessCode()">
-    Unlock Flipbook
-  </button>
-  <p id="errorMessage">Please enter your code to continue.</p>
 
-  <!-- FLIPBOOK -->
+  <section id="gate">
+    <h2>Enter Access Code</h2>
+    <input id="accessCodeInput" placeholder="Enter your unique code"/>
+    <br/>
+    <button id="unlockButton">Unlock Flipbook</button>
+  </section>
+
   <div id="flipbookContainer">
     <div id="flipbook"></div>
   </div>
 
-  <!-- PageFlip JS -->
-  <script src="/libs/stpageflip/js/pageflip.min.js"></script>
+  <!-- STPageFlip JS -->
+  <script src="libs/stpageflip/js/pageflip.min.js"></script>
   <script>
+    document.getElementById('unlockButton').addEventListener('click', validateAccessCode);
+
     function validateAccessCode() {
-      const input = document.getElementById("accessCodeInput").value.trim();
-      if (!input) {
-        document.getElementById("errorMessage").style.display = "block";
+      const val = document.getElementById('accessCodeInput').value.trim();
+      if (!val) {
+        // no code entered
+        document.getElementById('accessCodeInput').focus();
         return;
       }
       // hide gate
-      document.getElementById("accessCodeInput").style.display = "none";
-      document.getElementById("unlockButton").style.display = "none";
-      document.getElementById("errorMessage").style.display = "none";
+      document.getElementById('gate').style.display = 'none';
+      // show flipbook
       loadFlipbook();
     }
 
     function loadFlipbook() {
-      // show flipbook container
-      const wrapper = document.getElementById("flipbookContainer");
-      wrapper.style.display = "block";
+      const wrapper = document.getElementById('flipbookContainer');
+      wrapper.style.display = 'block';
 
-      // measure the CSS-sized flipbook DIV
-      const flipbookEl = document.getElementById("flipbook");
+      const flipbookEl = document.getElementById('flipbook');
+      // measure actual CSS size
       const width  = flipbookEl.clientWidth;
       const height = flipbookEl.clientHeight;
 
-      // instantiate PageFlip with those exact dimensions
       const flipbook = new St.PageFlip(flipbookEl, {
         width, height,
-        size: "stretch",
-        minWidth: 315,   maxWidth: 2000,
-        minHeight: 400,  maxHeight: 2000,
+        size: 'stretch',
+        minWidth: 315, maxWidth: 2000,
+        minHeight: 400, maxHeight: 2000,
         showCover: true,
         drawShadow: true,
-        flippingTime: 1000,
+        flippingTime: 800,
         mobileScrollSupport: false,
         useMouseEvents: true,
         disableFlipByClick: false,
@@ -111,9 +110,10 @@
         responsive: true
       });
 
-      // load your PDF (from Vercel’s /pdf folder)
-      flipbook.loadFromPDF("/pdf/Girl-Get-Up-Flipbook.pdf");
+      // load your PDF from Vercel's /pdf folder
+      flipbook.loadFromPDF('/pdf/Girl-Get-Up-Flipbook.pdf');
     }
   </script>
+
 </body>
 </html>
