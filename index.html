@@ -2,43 +2,89 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta 
-    name="viewport" 
-    content="width=device-width, initial-scale=1.0" 
-  />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Girl, Get Up! Flipbook</title>
 
   <!-- STPageFlip CSS -->
-  <link 
-    rel="stylesheet" 
-    href="libs/stpageflip/css/pageflip.css" 
-  />
-  <!-- Your custom styles, if any -->
-  <link 
-    rel="stylesheet" 
-    href="css/style.css" 
-  />
+  <link rel="stylesheet" href="libs/stpageflip/css/pageflip.css" />
+
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    #accessCodeInput {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 250px;
+    }
+    #unlockBtn {
+      margin-top: 1rem;
+      padding: 0.6rem 1.5rem;
+      font-size: 1rem;
+      background-color: #111;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    #flipbookContainer {
+      display: none;
+      margin-top: 3rem;
+      width: 90%;
+      height: 80vh;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    #errorMessage { 
+      color: red;
+      margin-top: 1rem;
+      display: none;
+    }
+  </style>
 </head>
-<body style="font-family:sans-serif; text-align:center;">
 
-  <h1 style="margin:2rem 0">Girl, Get Up! Flipbook</h1>
+<body>
+  <h1>Enter Access Code</h1>
 
-  <!-- Flipbook Container -->
-  <div 
-    id="flipbookContainer" 
-    style="width:90%; max-width:800px; height:80vh; margin:auto"
-  ></div>
+  <input
+    type="text"
+    id="accessCodeInput"
+    placeholder="Enter your unique code"
+  />
+  <br/>
+  <button id="unlockBtn">Unlock Flipbook</button>
+  <p id="errorMessage">Invalid code. Please try again.</p>
+
+  <div id="flipbookContainer">
+    <div id="flipbook"></div>
+  </div>
 
   <!-- STPageFlip JS -->
   <script src="libs/stpageflip/js/pageflip.min.js"></script>
-  <!-- Your app logic -->
   <script>
-    document.addEventListener("DOMContentLoaded", () => {
-      const flipbook = new St.PageFlip(
-        document.getElementById("flipbookContainer"), {
+    document.getElementById('unlockBtn')
+            .addEventListener('click', loadFlipbook);
+
+    function loadFlipbook() {
+      // hide gate UI
+      document.getElementById('accessCodeInput').style.display = 'none';
+      document.getElementById('unlockBtn').style.display     = 'none';
+
+      // show flipbook container
+      const container = document.getElementById('flipbookContainer');
+      container.style.display = 'block';
+
+      // initialize STPageFlip
+      const flip = new St.PageFlip(
+        document.getElementById('flipbook'),
+        {
           width: 600,
           height: 800,
-          size: "stretch",
+          size: 'stretch',
           minWidth: 315,
           maxWidth: 1000,
           minHeight: 400,
@@ -55,13 +101,10 @@
         }
       );
 
-      // adjust this path to wherever your PDF actually lives:
-      // local:     "pdf/Girl-Get-Up-Flipbook.pdf"
-      // github/Vercel: "/Girl-Get-Up-Flipbook.pdf"
-      // external URL:
-      // "https://assets.zyrosite.com/A3QOQlw2ewfbBvRv/girl-get-up-flipbook-mxBXVvZGjRuoJ9Oq.pdf"
-      flipbook.loadFromPDF("pdf/Girl-Get-Up-Flipbook.pdf");
-    });
+      // load your PDF from your own folder
+      flip.loadFromPDF('pdf/Girl-Get-Up-Flipbook.pdf');
+    }
   </script>
 </body>
 </html>
+
