@@ -1,13 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Girl, Get Up! Flipbook</title>
 
-  <!-- STPageFlip CSS -->
- <link rel="stylesheet" href="css/style.css">
+  <!-- Your main styles -->
+  <link rel="stylesheet" href="css/style.css">
 
+  <!-- Optional: PageFlip core styles from CDN -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.css">
 
   <style>
     body {
@@ -68,20 +70,20 @@
   <div id="flipbookContainer">
     <div id="flipbook"></div>
   </div>
-<!-- PDF.js (must load before STPageFlip if using loadFromPDF) -->
-<script src="pdfjs/pdf.min.js"></script>
-<script>
-  if (window['pdfjsLib']) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';
-  }
-</script>
 
-<!-- STPageFlip JS -->
-<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.min.js"></script>
+  <!-- PDF.js (must load before STPageFlip if using loadFromPDF) -->
+  <script src="pdfjs/pdf.min.js"></script>
+  <script>
+    if (window['pdfjsLib']) {
+      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';
+    }
+  </script>
 
+  <!-- PageFlip JS (keep ONLY the browser build; load it BEFORE your init code) -->
+  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
-<!-- Your inline code MUST be wrapped in <script> ... </script> -->
-<script>
+  <!-- Your inline code MUST be wrapped in <script> ... </script> -->
+  <script>
     // When clicked, if any non-empty code is entered, hide gate & show flipbook
     document.getElementById('unlockButton').addEventListener('click', () => {
       const code = document.getElementById('accessCodeInput').value.trim();
@@ -121,8 +123,8 @@
       flip.loadFromPDF('/pdf/Girl-Get-Up-Flipbook.pdf');
     }
   </script>
-<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
 </body>
 </html>
+
 
