@@ -55,6 +55,34 @@
       width: 100%;
       height: 100%;
     }
+    #gate h2 { margin-bottom: 8px; }
+#accessCodeInput:focus { outline: 2px solid #111; }
+#flipbookContainer { background:#fff; max-width: 1200px; }
+/* Watermark overlay */
+#flipbookContainer { position: relative; } /* ensure overlay positions correctly */
+#flipbookContainer::after {
+  content: "Girl, Get Up! ©";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  user-select: none;
+  font: 700 48px/1 sans-serif;
+  color: rgba(0,0,0,0.12);
+  transform: rotate(-25deg);
+  letter-spacing: 2px;
+}
+#flipbook { background:#fff; }
+/* Keep FS button pinned in fullscreen */
+#flipbookContainer:fullscreen #fsBtn,
+#flipbookContainer:-webkit-full-screen #fsBtn {
+  position: fixed;
+  top: 12px;
+  right: 12px;
+  z-index: 9999;
+}
+
   </style>
 </head>
 <body>
@@ -66,10 +94,13 @@
     <button id="unlockButton">Unlock Flipbook</button>
   </section>
 
-  <!-- FLIPBOOK -->
   <div id="flipbookContainer">
+    <button id="fsBtn" style="position:absolute;right:12px;top:12px;z-index:10">Fullscreen</button>
     <div id="flipbook"></div>
-  </div>
+    <div id="spinner" style="display:none;padding:12px">Loading…</div>
+</div>
+
+
 
   <!-- PDF.js (must load before STPageFlip if using loadFromPDF) -->
   <script src="pdfjs/pdf.min.js"></script>
@@ -84,44 +115,127 @@
 
   <!-- Your inline code MUST be wrapped in <script> ... </script> -->
   <script>
-    // When clicked, if any non-empty code is entered, hide gate & show flipbook
-    document.getElementById('unlockButton').addEventListener('click', () => {
-      const code = document.getElementById('accessCodeInput').value.trim();
-      if (!code) {
-        document.getElementById('accessCodeInput').focus();
-        return;
-      }
-      document.getElementById('gate').style.display = 'none';
-      initFlipbook();
-    });
+  // --- CONFIG ---
+const CORRECT_CODE = "YOUR-ACCESS-CODE";   // <— set this
+const ATTEMPT_LIMIT = 5;                   // tries before temporary lock
+const LOCK_SECONDS = 120;                  // lockout duration
+// --------------
 
-    function initFlipbook() {
-      const container = document.getElementById('flipbookContainer');
-      container.style.display = 'block';
+// read ?access=... to auto-unlock
+const urlParams = new URLSearchParams(location.search);
+const urlCode = urlParams.get("access");
 
-      const el = document.getElementById('flipbook');
-      const width  = el.clientWidth;
-      const height = el.clientHeight;
+// simple state
+let attempts = 0;
+let lockedUntil = 0;
 
-      const flip = new St.PageFlip(el, {
-        width, height,
-        size: 'stretch',
-        minWidth: 315, maxWidth: 2000,
-        minHeight: 400, maxHeight: 2000,
-        showCover: true,
-        drawShadow: true,
-        flippingTime: 800,
-        mobileScrollSupport: false,
-        useMouseEvents: true,
-        disableFlipByClick: false,
-        showPageCorners: true,
-        useKeyboard: true,
-        responsive: true
-      });
+// small helper
+function nowSec(){ return Math.floor(Date.now()/1000); }
 
-      // Load your PDF from the /pdf folder
-      flip.loadFromPDF('/pdf/Girl-Get-Up-Flipbook.pdf');
+function showErr(msg){
+  let box = document.getElementById("errorBox");
+  if(!box){
+    box = document.createElement("div");
+    box.id = "errorBox";
+    box.style.cssText = "margin:12px auto;max-width:520px;color:#a00;background:#fee;border:1px solid #f99;padding:10px 12px;border-radius:6px;text-align:left;";
+    document.getElementById("gate").appendChild(box);
+  }
+  box.textContent = msg;
+}
+
+async function tryUnlock(inputCode){
+  const t = nowSec();
+  if (t < lockedUntil) {
+    const wait = lockedUntil - t;
+    showErr(`Too many attempts. Try again in ${wait}s.`);
+    return;
+  }
+  if (!inputCode) {
+    document.getElementById('accessCodeInput').focus();
+    return;
+  }
+  if (inputCode !== CORRECT_CODE) {
+    attempts++;
+    if (attempts >= ATTEMPT_LIMIT) {
+      lockedUntil = nowSec() + LOCK_SECONDS;
+      attempts = 0;
+      showErr(`Too many attempts. Locked for ${LOCK_SECONDS}s.`);
+    } else {
+      showErr(`Invalid code. ${ATTEMPT_LIMIT - attempts} attempt(s) left.`);
     }
+    return;
+  }
+  // success
+  document.getElementById('gate').style.display = 'none';
+  await initFlipbook();
+}
+
+document.getElementById('unlockButton').addEventListener('click', () => {
+  tryUnlock(document.getElementById('accessCodeInput').value.trim());
+});
+
+if (urlCode) {
+  tryUnlock(urlCode.trim());
+}
+
+
+    async function pdfReachable(path){
+  try {
+    const r = await fetch(path, { method: 'HEAD' });
+    return r.ok;
+  } catch { return false; }
+}
+
+async function initFlipbook() {
+  const container = document.getElementById('flipbookContainer');
+  const el = document.getElementById('flipbook');
+  const spinner = document.getElementById('spinner');
+  const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
+
+  if (!(await pdfReachable(PDF_PATH))) {
+    showErr('PDF not found at ' + PDF_PATH + ' (check file name/case).');
+    return;
+  }
+
+  container.style.display = 'block';
+  spinner.style.display = 'block';
+
+  const width  = el.clientWidth;
+  const height = el.clientHeight;
+
+  const flip = new St.PageFlip(el, {
+    width, height,
+    size: 'stretch',
+    minWidth: 315, maxWidth: 2000,
+    minHeight: 400, maxHeight: 2000,
+    showCover: true,
+    drawShadow: true,
+    flippingTime: 800,
+    mobileScrollSupport: false,
+    useMouseEvents: true,
+    disableFlipByClick: false,
+    showPageCorners: true,
+    useKeyboard: true,
+    responsive: true
+  });
+
+  try {
+    await flip.loadFromPDF(PDF_PATH);
+  } catch (e) {
+    showErr('Failed to load PDF: ' + e.message);
+  } finally {
+    spinner.style.display = 'none';
+  }
+}
+document.getElementById('fsBtn')?.addEventListener('click', () => {
+  const el = document.getElementById('flipbookContainer');
+  if (!document.fullscreenElement) {
+    el.requestFullscreen?.();
+  } else {
+    document.exitFullscreen?.();
+  }
+});
+
   </script>
 
 </body>
