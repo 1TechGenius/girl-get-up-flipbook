@@ -204,6 +204,21 @@ document.getElementById('unlockButton').addEventListener('click', () => {
   } catch { return false; }
 }
 
+async function renderPdfToImages(path){
+  const pdf = await pdfjsLib.getDocument(path).promise;
+  const images = [];
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const viewport = page.getViewport({ scale: 2 }); // crisp
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = viewport.width;
+    canvas.height = viewport.height;
+    await page.render({ canvasContext: ctx, viewport }).promise;
+    images.push(canvas.toDataURL('image/png'));
+  }
+  return images;
+}
 
 async function initFlipbook() {
   const container = document.getElementById('flipbookContainer');
@@ -238,13 +253,15 @@ const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
   });
 
   try {
-    await flip.loadFromPDF(PDF_PATH);
-  } catch (e) {
-    showErr('Failed to load PDF: ' + e.message);
-  } finally {
-    spinner.style.display = 'none';
-  }
+  const imgs = await renderPdfToImages(PDF_PATH);
+  if (!imgs.length) throw new Error('No pages rendered from PDF');
+  await flip.loadFromImages(imgs);
+} catch (e) {
+  showErr('Failed to load PDF: ' + e.message);
+} finally {
+  spinner.style.display = 'none';
 }
+
 
 
 document.getElementById('fsBtn')?.addEventListener('click', () => {
