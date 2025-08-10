@@ -204,7 +204,7 @@ async function initFlipbook() {
   const container = document.getElementById('flipbookContainer');
   const el = document.getElementById('flipbook');
   const spinner = document.getElementById('spinner');
-const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
+cconst PDF_PATH = 'https://girl-get-up-flipbook.vercel.app/pdf/Girl-Get-Up-Flipbook.pdf';
 
   if (!(await pdfReachable(PDF_PATH))) {
     showErr('PDF not found at ' + PDF_PATH + ' (check file name/case).');
