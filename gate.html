@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Flipbook Access</title>
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:#f7f7f7; }
+    .wrap { max-width: 460px; margin: 5rem auto; background:#fff; padding: 1.5rem; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,.06); }
+    h1 { font-size: 1.25rem; margin: 0 0 .5rem; }
+    p { margin: 0 0 1rem; color:#555; }
+    input, button { width: 100%; padding: .85rem; font-size: 1rem; box-sizing: border-box; }
+    input { border: 1px solid #ccc; border-radius: 8px; }
+    button { margin-top: .75rem; border: 0; border-radius: 8px; background:#111; color:#fff; cursor: pointer; }
+    .err { display:none; margin-top: .75rem; color:#a00; background:#fee; border:1px solid #f99; padding:.6rem .8rem; border-radius:8px; }
+    .foot { margin-top: 1rem; font-size: .9rem; color:#777; text-align:center; }
+    a { color: inherit; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Enter Bundle Password</h1>
+    <p>This page is protected. Please enter the password to continue.</p>
+
+    <input id="pw" type="password" placeholder="Password (case-sensitive)" autocomplete="off" />
+    <button id="go">Continue</button>
+    <div id="err" class="err">Incorrect password. Please try again.</div>
+
+    <div class="foot">
+      <a href="https://giablessings.com/digital-flip-book-bundle-access">Back</a>
+    </div>
+  </div>
+
+  <script>
+    // Case-sensitive password
+    const CORRECT_PASSWORD = "1*FliPbook";
+
+    // Where to go after success:
+    // Keep the code gate on index.html (user will enter GGU2025 there)
+    const REDIRECT_TO = "/";
+
+    // If you ever want to SKIP the code step and auto-unlock, use:
+    // const REDIRECT_TO = "/?code=GGU2025";
+
+    const pw = document.getElementById('pw');
+    const go = document.getElementById('go');
+    const err = document.getElementById('err');
+
+    function unlock(){
+      if (pw.value === CORRECT_PASSWORD) {
+        location.href = REDIRECT_TO;
+      } else {
+        err.style.display = 'block';
+        err.textContent = "Incorrect password. Please try again.";
+        pw.focus(); pw.select();
+      }
+    }
+
+    go.addEventListener('click', unlock);
+    pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') unlock(); });
+  </script>
+</body>
+</html>
