@@ -116,8 +116,7 @@
 </script>
 
 
-  <!-- PageFlip JS (keep ONLY the browser build; load it BEFORE your init code) -->
-  <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
+  
 
   <!-- Your inline code MUST be wrapped in <script> ... </script> -->
   <script>
@@ -127,9 +126,19 @@ const ATTEMPT_LIMIT = 5;                   // tries before temporary lock
 const LOCK_SECONDS = 120;                  // lockout duration
 // --------------
 
-// read ?access=... to auto-unlock
-const urlParams = new URLSearchParams(location.search);
-const urlCode = urlParams.get("access");
+// read access code from URL (supports ?access=, ?code=, ?Access=, or #CODE)
+(() => {
+  const u = new URL(location.href);
+  const raw =
+    u.searchParams.get('access') ||
+    u.searchParams.get('code')   ||
+    u.searchParams.get('Access') ||
+    (u.hash ? u.hash.replace(/^#/, '') : '') || '';
+
+  const urlCode = decodeURIComponent(raw).trim();
+  if (urlCode) tryUnlock(urlCode);
+})();
+
 
 // simple state
 let attempts = 0;
