@@ -82,6 +82,10 @@
   right: 12px;
   z-index: 9999;
 }
+/* Disable printing from this page */
+@media print {
+  body { display: none !important; }
+}
 
   </style>
 </head>
@@ -235,6 +239,24 @@ document.getElementById('fsBtn')?.addEventListener('click', () => {
     document.exitFullscreen?.();
   }
 });
+// Block right-click menu
+document.addEventListener('contextmenu', (e) => e.preventDefault());
+
+// Block common “save/print/view-source” shortcuts
+document.addEventListener('keydown', (e) => {
+  const k = e.key.toLowerCase();
+  const meta = e.metaKey || e.ctrlKey;
+  if (
+    (meta && (k === 'p' || k === 's' || k === 'u' || k === 'o')) || // Cmd/Ctrl+P/S/U/O
+    (e.shiftKey && meta && (k === 'i' || k === 'j' || k === 'c'))   // Devtools combos
+  ) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+});
+
+// Block dragging images/canvas
+document.addEventListener('dragstart', (e) => e.preventDefault());
 
   </script>
 
