@@ -153,11 +153,15 @@ function showErr(msg){
   if(!box){
     box = document.createElement("div");
     box.id = "errorBox";
-    box.style.cssText = "margin:12px auto;max-width:520px;color:#a00;background:#fee;border:1px solid #f99;padding:10px 12px;border-radius:6px;text-align:left;";
-    document.getElementById("gate").appendChild(box);
+    box.style.cssText =
+      "position:fixed;left:50%;top:16px;transform:translateX(-50%);" +
+      "max-width:720px;padding:10px 14px;border-radius:8px;" +
+      "background:#fee;color:#a00;border:1px solid #f99;z-index:99999;";
+    document.body.appendChild(box);
   }
   box.textContent = msg;
 }
+
 
 async function tryUnlock(inputCode){
   const t = nowSec();
@@ -193,23 +197,23 @@ document.getElementById('unlockButton').addEventListener('click', () => {
 
 
 
-    async function pdfReachable(path){
+   async function pdfReachable(path){
   try {
-    const r = await fetch(path, { method: 'HEAD' });
+    const r = await fetch(path, { method: 'GET', cache: 'no-store' });
     return r.ok;
   } catch { return false; }
 }
+
 
 async function initFlipbook() {
   const container = document.getElementById('flipbookContainer');
   const el = document.getElementById('flipbook');
   const spinner = document.getElementById('spinner');
-const PDF_PATH = 'https://girl-get-up-flipbook.vercel.app/pdf/Girl-Get-Up-Flipbook.pdf';
+const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
 
-  if (!(await pdfReachable(PDF_PATH))) {
-    showErr('PDF not found at ' + PDF_PATH + ' (check file name/case).');
-    return;
-  }
+
+  // (No pre-check, let loadFromPDF handle errors)
+
 
   container.style.display = 'block';
   spinner.style.display = 'block';
