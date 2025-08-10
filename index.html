@@ -9,7 +9,7 @@
   <link rel="stylesheet" href="css/style.css">
 
   <!-- Optional: PageFlip core styles from CDN -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/css/page-flip.css">
+  
 
   <style>
     body {
@@ -106,13 +106,15 @@
 
 
 
-  <!-- PDF.js (must load before STPageFlip if using loadFromPDF) -->
-  <script src="pdfjs/pdf.min.js"></script>
-  <script>
-    if (window['pdfjsLib']) {
-      pdfjsLib.GlobalWorkerOptions.workerSrc = 'pdfjs/pdf.worker.min.js';
-    }
-  </script>
+ <!-- PDF.js from CDN (must load before PageFlip when using loadFromPDF) -->
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"></script>
+<script>
+  if (window['pdfjsLib']) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+  }
+</script>
+
 
   <!-- PageFlip JS (keep ONLY the browser build; load it BEFORE your init code) -->
   <script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
