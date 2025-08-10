@@ -200,41 +200,27 @@ document.getElementById('unlockButton').addEventListener('click', () => {
   } catch { return false; }
 }
 
-<script>
 async function initFlipbook() {
   const container = document.getElementById('flipbookContainer');
-  const el        = document.getElementById('flipbook');
-  const spinner   = document.getElementById('spinner');
-  const PDF_PATH  = '/pdf/Girl-Get-Up-Flipbook.pdf';
+  const el = document.getElementById('flipbook');
+  const spinner = document.getElementById('spinner');
+const PDF_PATH = 'https://girl-get-up-flipbook.vercel.app/pdf/Girl-Get-Up-Flipbook.pdf';
 
-  console.log('[Flipbook] init… PDF_PATH =', PDF_PATH);
-
-  // Try HEAD, but do NOT return if it fails — just log and continue
-  try {
-    const r = await fetch(PDF_PATH, { method: 'HEAD' });
-    console.log('[Flipbook] HEAD status:', r.status, r.ok);
-  } catch (e) {
-    console.warn('[Flipbook] HEAD request threw (continuing anyway):', e);
+  if (!(await pdfReachable(PDF_PATH))) {
+    showErr('PDF not found at ' + PDF_PATH + ' (check file name/case).');
+    return;
   }
 
   container.style.display = 'block';
-  spinner.style.display    = 'block';
+  spinner.style.display = 'block';
 
   const width  = el.clientWidth;
   const height = el.clientHeight;
-  console.log('[Flipbook] el size:', width, height);
-
-  // PageFlip must be available on window.St
-  if (!window.St || !window.St.PageFlip) {
-    console.error('[Flipbook] St.PageFlip is not available. Check the PageFlip <script> tag order.');
-    spinner.style.display = 'none';
-    return;
-  }
 
   const flip = new St.PageFlip(el, {
     width, height,
     size: 'stretch',
-    minWidth: 315,  maxWidth: 2000,
+    minWidth: 315, maxWidth: 2000,
     minHeight: 400, maxHeight: 2000,
     showCover: true,
     drawShadow: true,
@@ -248,17 +234,14 @@ async function initFlipbook() {
   });
 
   try {
-    console.log('[Flipbook] calling loadFromPDF…');
     await flip.loadFromPDF(PDF_PATH);
-    console.log('[Flipbook] loadFromPDF done');
   } catch (e) {
-    console.error('[Flipbook] Failed to load PDF:', e);
-    showErr('Failed to load PDF: ' + (e?.message || e));
+    showErr('Failed to load PDF: ' + e.message);
   } finally {
     spinner.style.display = 'none';
   }
 }
-</script>
+
 
 document.getElementById('fsBtn')?.addEventListener('click', () => {
   const el = document.getElementById('flipbookContainer');
