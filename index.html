@@ -106,25 +106,21 @@
 
 
 
- <!-- PDF.js from CDN (must load before PageFlip when using loadFromPDF) -->
+<!-- PDF.js from CDN (must load before PageFlip when using loadFromPDF) -->
 <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
 <script>
-  if (window['pdfjsLib']) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js";
-  }
-</script>
-
-  if (window['pdfjsLib']) {
+  if (window.pdfjsLib) {
     pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js';
+      "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js";
   }
 </script>
 
+<!-- PageFlip (browser build) -->
+<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
 
-  
+<!-- Your inline code -->
+<script>
 
-  <!-- Your inline code MUST be wrapped in <script> ... </script> -->
-  <script>
   // --- CONFIG ---
 const CORRECT_CODE = "GGU2025";   // <— live access code
 const ATTEMPT_LIMIT = 5;                   // tries before temporary lock
@@ -194,9 +190,7 @@ document.getElementById('unlockButton').addEventListener('click', () => {
   tryUnlock(document.getElementById('accessCodeInput').value.trim());
 });
 
-if (urlCode) {
-  tryUnlock(urlCode.trim());
-}
+
 
 
     async function pdfReachable(path){
