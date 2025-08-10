@@ -94,15 +94,12 @@
   <!-- ACCESS GATE -->
   <section id="gate">
   <h2>Enter Access Code</h2>
-  <input id="accessCodeInput" placeholder="Enter your unique code"/>
-  <button
-    id="unlockButton"
-    type="button"
-    onclick="tryUnlock(document.getElementById('accessCodeInput').value.trim())"
-  >
-    Unlock Flipbook
-  </button>
+  <form method="GET" action="">
+    <input id="accessCodeInput" name="code" placeholder="Enter your unique code" />
+    <button id="unlockButton" type="submit">Unlock Flipbook</button>
+  </form>
 </section>
+
 
 
   <div id="flipbookContainer">
