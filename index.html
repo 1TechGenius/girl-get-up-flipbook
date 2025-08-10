@@ -252,15 +252,31 @@ const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
     responsive: true
   });
 
-  try {
-  const imgs = await renderPdfToImages(PDF_PATH);
-  if (!imgs.length) throw new Error('No pages rendered from PDF');
-  await flip.loadFromImages(imgs);
+ // NEW
+try {
+  // 1) Render PDF pages to data-URL strings
+  const srcs = await renderPdfToImages(PDF_PATH);
+  if (!srcs.length) throw new Error('No pages rendered from PDF');
+
+  // 2) Turn those strings into real <img> elements
+  const images = srcs.map((src) => {
+    const img = new Image();
+    img.src = src;
+    img.draggable = false;
+    img.loading = 'eager';
+    img.style.width = '100%';
+    img.style.height = 'auto';
+    return img;
+  });
+
+  // 3) Load into PageFlip
+  await flip.loadFromImages(images);
 } catch (e) {
   showErr('Failed to load PDF: ' + e.message);
 } finally {
   spinner.style.display = 'none';
 }
+
 
 
 
