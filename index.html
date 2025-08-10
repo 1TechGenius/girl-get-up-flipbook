@@ -93,10 +93,17 @@
 
   <!-- ACCESS GATE -->
   <section id="gate">
-    <h2>Enter Access Code</h2>
-    <input id="accessCodeInput" placeholder="Enter your unique code"/>
-    <button id="unlockButton">Unlock Flipbook</button>
-  </section>
+  <h2>Enter Access Code</h2>
+  <input id="accessCodeInput" placeholder="Enter your unique code"/>
+  <button
+    id="unlockButton"
+    type="button"
+    onclick="tryUnlock(document.getElementById('accessCodeInput').value.trim())"
+  >
+    Unlock Flipbook
+  </button>
+</section>
+
 
   <div id="flipbookContainer">
     <button id="fsBtn" style="position:absolute;right:12px;top:12px;z-index:10">Fullscreen</button>
@@ -192,6 +199,10 @@ async function tryUnlock(inputCode){
 
 document.getElementById('unlockButton').addEventListener('click', () => {
   tryUnlock(document.getElementById('accessCodeInput').value.trim());
+});
+// Ensure Enter key submits the code
+document.getElementById('accessCodeInput').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') tryUnlock(e.target.value.trim());
 });
 
 
