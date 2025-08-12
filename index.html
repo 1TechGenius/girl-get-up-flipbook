@@ -101,7 +101,8 @@
 
     function hideGate(){ gateEl.hidden = true; }
     function tryUnlock(code){
-      const ok = (code||'').trim().toLowerCase() === ACCESS_CODE.trim().toLowerCase();
+      const ok = (code || '') === ACCESS_CODE;  // exact match, case-sensitive
+
       if(ok){ hideGate(); initPDF(); return true; }
       msgEl.textContent = 'Invalid code. Try again.'; return false;
     }
