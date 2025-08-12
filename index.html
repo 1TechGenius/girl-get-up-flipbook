@@ -88,7 +88,13 @@
       <small id="gate_msg" role="status"></small>
     </div>
   </div>
-  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+<script>
+  if (window['pdfjsLib']) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
+  }
+</script>
+
   <script>
     // ====== CONFIG ======
     const EBOOK_URL = "/pdf/Girl-Get-Up-eBook.pdf"; // served from /public
