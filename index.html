@@ -82,7 +82,8 @@
       <p>Access is for purchasers only. Enter the code from your receipt to open the ebook.</p>
       <div class="gate-row">
         <input id="code_input" type="password" inputmode="text" autocomplete="one-time-code" placeholder="Access code" />
-        <button id="unlock_btn">Unlock</button>
+       <button id="unlock_btn" type="button">Unlock</button>
+
       </div>
       <small id="gate_msg" role="status"></small>
     </div>
@@ -99,25 +100,41 @@
     const inputEl = document.getElementById('code_input');
     const unlockBtn = document.getElementById('unlock_btn');
 <script>
-// ... keep your constants
-// const EBOOK_URL = "/pdf/Girl-Get-Up-eBook.pdf";
-// const ACCESS_CODE = "GGU2025";
+  // keep your existing constants above this:
+  // const EBOOK_URL = "/pdf/Girl-Get-Up-eBook.pdf";
+  // const ACCESS_CODE = "GGU2025";
 
-function hideGate(){ gateEl.hidden = true; }
+  // Make tryUnlock global so inline + listeners both work
+  function tryUnlock(raw) {
+    var code = (raw || "").trim();               // trim just in case
+    var ok = code === ACCESS_CODE;               // case-sensitive
+    var gate = document.getElementById("gate");
+    var msg  = document.getElementById("gate_msg");
+    if (ok) {
+      if (gate) gate.hidden = true;
+      if (typeof initPDF === "function") initPDF();
+      return true;
+    }
+    if (msg) msg.textContent = "Invalid code. Try again.";
+    return false;
+  }
+  window.tryUnlock = tryUnlock;
 
-// TEMP robust compare + debug (works even if stray spaces/case)
-function tryUnlock(code){
-  const entered = (code ?? "").trim();
-  console.log("Entered:", entered, "Expected:", ACCESS_CODE);
-  const ok = entered.toLowerCase() === ACCESS_CODE.toLowerCase();
-  if (ok) { hideGate(); initPDF(); return true; }
-  msgEl.textContent = "Invalid code. Try again.";
-  return false;
-}
-
-unlockBtn.addEventListener("click", () => tryUnlock(inputEl.value));
-inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(inputEl.value); });
+  // Bind after DOM is ready (covers timing issues)
+  document.addEventListener("DOMContentLoaded", function () {
+    var input = document.getElementById("code_input");
+    var btn   = document.getElementById("unlock_btn");
+    if (btn && input) {
+      btn.addEventListener("click", function(){ tryUnlock(input.value); });
+      input.addEventListener("keydown", function(e){
+        if (e.key === "Enter") tryUnlock(input.value);
+      });
+      // optional: focus for faster entry
+      setTimeout(function(){ try{ input.focus(); }catch(e){} }, 50);
+    }
+  });
 </script>
+
 
     // ====== PDF.js setup ======
     const canvas = document.getElementById('pdf_canvas');
