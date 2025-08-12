@@ -98,17 +98,26 @@
     const msgEl = document.getElementById('gate_msg');
     const inputEl = document.getElementById('code_input');
     const unlockBtn = document.getElementById('unlock_btn');
+<script>
+// ... keep your constants
+// const EBOOK_URL = "/pdf/Girl-Get-Up-eBook.pdf";
+// const ACCESS_CODE = "GGU2025";
 
-    function hideGate(){ gateEl.hidden = true; }
-    function tryUnlock(code){
-      const ok = (code || '') === ACCESS_CODE;  // exact match, case-sensitive
+function hideGate(){ gateEl.hidden = true; }
 
-      if(ok){ hideGate(); initPDF(); return true; }
-      msgEl.textContent = 'Invalid code. Try again.'; return false;
-    }
+// TEMP robust compare + debug (works even if stray spaces/case)
+function tryUnlock(code){
+  const entered = (code ?? "").trim();
+  console.log("Entered:", entered, "Expected:", ACCESS_CODE);
+  const ok = entered.toLowerCase() === ACCESS_CODE.toLowerCase();
+  if (ok) { hideGate(); initPDF(); return true; }
+  msgEl.textContent = "Invalid code. Try again.";
+  return false;
+}
 
-    unlockBtn.addEventListener('click', () => tryUnlock(inputEl.value));
-    inputEl.addEventListener('keydown', (e) => { if(e.key==='Enter') tryUnlock(inputEl.value); });
+unlockBtn.addEventListener("click", () => tryUnlock(inputEl.value));
+inputEl.addEventListener("keydown", (e) => { if (e.key === "Enter") tryUnlock(inputEl.value); });
+</script>
 
     // ====== PDF.js setup ======
     const canvas = document.getElementById('pdf_canvas');
