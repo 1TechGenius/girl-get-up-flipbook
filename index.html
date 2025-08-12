@@ -1,323 +1,211 @@
+<!-- FILE: /ebook-viewer/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Gia Blessings — Ebook Viewer</title>
+  <meta name="robots" content="noindex, noarchive" />
+  <style>
+    :root { --bg:#0e0e11; --panel:#141419; --ink:#ececf1; --muted:#9a9aa3; --brand:#e85a8b; --radius:18px; --shadow:0 10px 30px rgba(0,0,0,.35);} 
+    *{box-sizing:border-box} html,body{height:100%}
+    body{margin:0;background:radial-gradient(1200px 800px at 70% -10%,#1a1a22,var(--bg));color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Helvetica;display:grid;grid-template-rows:auto 1fr;gap:14px}
+    header{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:transparent}
+    header .title{font-size:16px;letter-spacing:.3px;color:var(--muted)}
+    .viewer{display:grid;grid-template-rows:auto 1fr;gap:12px;max-width:1100px;margin:0 auto 26px;width:100%;padding:0 12px 18px}
+    .toolbar{background:rgba(20,20,25,.7);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(8px);border-radius:var(--radius);box-shadow:var(--shadow);padding:10px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+    button,.tool-input{appearance:none;border:1px solid rgba(255,255,255,.1);background:#1a1a22;color:var(--ink);padding:8px 10px;border-radius:12px;font-size:14px;line-height:1;cursor:pointer}
+    button:hover{border-color:rgba(255,255,255,.22)}
+    .tool-group{display:inline-flex;gap:8px;align-items:center}.tool-sep{width:1px;height:26px;background:rgba(255,255,255,.08);margin:0 4px}
+    .tool-input{width:70px;text-align:center}.tool-label{color:var(--muted);font-size:12px}
+    .stage{position:relative;background:#0f0f14;border:1px solid rgba(255,255,255,.08);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;display:grid;place-items:center;min-height:min(82vh,1000px)}
+    canvas{width:100%;height:auto;max-height:100%;display:block}
+    .gate{position:fixed;inset:0;display:grid;place-items:center;background:radial-gradient(900px 600px at 60% -10%,rgba(255,255,255,.05),rgba(14,14,17,.92));z-index:50;backdrop-filter:blur(6px)}
+    .gate-card{width:min(480px,92vw);background:#141419;border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:var(--shadow);padding:22px;display:grid;gap:12px;text-align:left}
+    .gate-card h2{margin:2px 0 0;font-weight:650;font-size:18px;letter-spacing:.2px}
+    .gate-card p{margin:0;color:var(--muted);font-size:14px}
+    .gate-row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:10px}
+    .gate input{padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:#181820;color:var(--ink);font-size:15px}
+    .gate button{padding:12px 18px;border-radius:14px;font-weight:600;background:linear-gradient(135deg,var(--brand),#c94d80);border:none}
+    .gate small{color:var(--muted)}
+    .brand-chip{margin-left:auto;display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:#15151b;font-size:12px;color:var(--muted)}
+    .dot{width:8px;height:8px;border-radius:50%;background:var(--brand);box-shadow:0 0 0 3px rgba(232,90,139,.15)}
+    @media(max-width:640px){.tool-input{width:58px}.viewer{gap:10px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">Gia Blessings — Ebook Viewer</div>
+    <div class="brand-chip"><span class="dot"></span> Read-only</div>
+  </header>
+  <main class="viewer">
+    <div class="toolbar" role="toolbar" aria-label="Ebook controls">
+      <div class="tool-group">
+        <button id="prev" title="Previous page" aria-label="Previous page">◀</button>
+        <button id="next" title="Next page" aria-label="Next page">▶</button>
+        <span class="tool-sep" aria-hidden="true"></span>
+        <span class="tool-label">Page</span>
+        <input id="page_num" class="tool-input" type="number" min="1" value="1" aria-label="Current page" />
+        <span class="tool-label" id="page_count">/ ?</span>
+      </div>
+      <div class="tool-group">
+        <button id="zoom_out" title="Zoom out" aria-label="Zoom out">−</button>
+        <button id="zoom_in" title="Zoom in" aria-label="Zoom in">＋</button>
+        <button id="fit_width" title="Fit to width" aria-label="Fit to width">Fit</button>
+      </div>
+      <div class="tool-group" style="margin-left:auto">
+        <span class="tool-label">Use arrow keys ←→</span>
+      </div>
+    </div>
+    <section class="stage">
+      <canvas id="pdf_canvas"></canvas>
+    </section>
+  </main>
+  <div id="gate" class="gate">
+    <div class="gate-card">
+      <h2>Enter Access Code</h2>
+      <p>Access is for purchasers only. Enter the code from your receipt to open the ebook.</p>
+      <div class="gate-row">
+        <input id="code_input" type="password" inputmode="text" autocomplete="one-time-code" placeholder="Access code" />
+        <button id="unlock_btn">Unlock</button>
+      </div>
+      <small id="gate_msg" role="status"></small>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.min.js"></script>
+  <script>
+    // ====== CONFIG ======
+    const EBOOK_URL = "/pdf/Girl-Get-Up-eBook.pdf"; // served from /public
+    const ACCESS_CODE = "GGU2025"; // from Rae
+
+    // ====== Gate logic ======
+    const gateEl = document.getElementById('gate');
+    const msgEl = document.getElementById('gate_msg');
+    const inputEl = document.getElementById('code_input');
+    const unlockBtn = document.getElementById('unlock_btn');
+
+    function hideGate(){ gateEl.hidden = true; }
+    function tryUnlock(code){
+      const ok = (code||'').trim().toLowerCase() === ACCESS_CODE.trim().toLowerCase();
+      if(ok){ hideGate(); initPDF(); return true; }
+      msgEl.textContent = 'Invalid code. Try again.'; return false;
+    }
+
+    unlockBtn.addEventListener('click', () => tryUnlock(inputEl.value));
+    inputEl.addEventListener('keydown', (e) => { if(e.key==='Enter') tryUnlock(inputEl.value); });
+
+    // ====== PDF.js setup ======
+    const canvas = document.getElementById('pdf_canvas');
+    const ctx = canvas.getContext('2d');
+    const pageNumInput = document.getElementById('page_num');
+    const pageCountLabel = document.getElementById('page_count');
+    const prevBtn = document.getElementById('prev');
+    const nextBtn = document.getElementById('next');
+    const zoomInBtn = document.getElementById('zoom_in');
+    const zoomOutBtn = document.getElementById('zoom_out');
+    const fitBtn = document.getElementById('fit_width');
+
+    let pdfDoc = null; let pageNum = 1; let scale = 1.2;
+    if (window['pdfjsLib']) { pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.4.168/build/pdf.worker.min.js'; }
+
+    function getFitWidthScale(viewport){ const stage=document.querySelector('.stage'); const width=stage.clientWidth-24; return width / viewport.width; }
+
+    async function renderPage(num){
+      const page = await pdfDoc.getPage(num);
+      const initialViewport = page.getViewport({ scale: 1 });
+      const dpr = window.devicePixelRatio || 1;
+      const viewport = page.getViewport({ scale });
+      canvas.width = Math.floor(viewport.width * dpr);
+      canvas.height = Math.floor(viewport.height * dpr);
+      canvas.style.width = Math.floor(viewport.width) + 'px';
+      canvas.style.height = Math.floor(viewport.height) + 'px';
+      const transform = [dpr,0,0,dpr,0,0];
+      await page.render({ canvasContext: ctx, viewport, transform }).promise;
+      pageNumInput.value = pageNum;
+      pageCountLabel.textContent = `/ ${pdfDoc.numPages}`;
+      fitBtn.dataset.fit = getFitWidthScale(initialViewport).toFixed(3);
+    }
+
+    async function queueRender(num){ pageNum = Math.min(Math.max(1,num), pdfDoc.numPages); await renderPage(pageNum); }
+    async function onPrev(){ if(pageNum<=1) return; pageNum--; await renderPage(pageNum); }
+    async function onNext(){ if(pageNum>=pdfDoc.numPages) return; pageNum++; await renderPage(pageNum); }
+    function onZoom(delta){ scale = Math.max(0.4, Math.min(4, scale + delta)); renderPage(pageNum); }
+    function onFitWidth(){ const s=parseFloat(fitBtn.dataset.fit||'1'); scale=s; renderPage(pageNum); }
+
+    function bindEvents(){
+      prevBtn.addEventListener('click', onPrev);
+      nextBtn.addEventListener('click', onNext);
+      zoomInBtn.addEventListener('click', () => onZoom(0.15));
+      zoomOutBtn.addEventListener('click', () => onZoom(-0.15));
+      fitBtn.addEventListener('click', onFitWidth);
+      pageNumInput.addEventListener('change', () => queueRender(parseInt(pageNumInput.value||'1',10)));
+      window.addEventListener('keydown', (e) => {
+        if(e.key==='ArrowLeft') onPrev();
+        if(e.key==='ArrowRight') onNext();
+        if((e.ctrlKey||e.metaKey) && (e.key==='+'||e.key==='=')){ e.preventDefault(); onZoom(0.15); }
+        if((e.ctrlKey||e.metaKey) && e.key==='-'){ e.preventDefault(); onZoom(-0.15); }
+      });
+      window.addEventListener('resize', () => { if(pdfDoc) renderPage(pageNum); });
+    }
+
+    async function initPDF(){
+      if(!EBOOK_URL) return;
+      pdfDoc = await pdfjsLib.getDocument({ url: EBOOK_URL }).promise;
+      bindEvents();
+      const page = await pdfDoc.getPage(1);
+      const initialViewport = page.getViewport({ scale: 1 });
+      scale = getFitWidthScale(initialViewport);
+      await renderPage(1);
+    }
+  </script>
+</body>
+</html>
+
+<!-- ===================================================== -->
+<!-- FILE: /digital-ebook-bundle-access/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Girl, Get Up! Flipbook</title>
-
-  <!-- Your main styles -->
-  <link rel="stylesheet" href="css/style.css">
-
-  <!-- Optional: PageFlip core styles from CDN -->
-  
-
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Gia Blessings — Digital Ebook Bundle Access</title>
+  <meta name="robots" content="noindex, noarchive" />
   <style>
-    body {
-      margin: 0;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-      background: #f9f9f9;
-    }
-    /* Gate UI */
-    #gate {
-      max-width: 400px;
-      margin: 2rem auto;
-    }
-    #gate input {
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1rem;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-      box-sizing: border-box;
-    }
-    #gate button {
-      margin-top: 1rem;
-      width: 100%;
-      padding: 0.75rem;
-      font-size: 1rem;
-      background: #111;
-      color: #fff;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    /* Flipbook container */
-    #flipbookContainer {
-      display: none;
-      width: 100%;
-      height: 80vh;
-      margin: 0 auto;
-      box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    }
-    #flipbook {
-      width: 100%;
-      height: 100%;
-    }
-    #gate h2 { margin-bottom: 8px; }
-#accessCodeInput:focus { outline: 2px solid #111; }
-#flipbookContainer { background:#fff; max-width: 1200px; }
-/* Watermark overlay */
-#flipbookContainer { position: relative; } /* ensure overlay positions correctly */
-#flipbookContainer::after {
-  content: "Girl, Get Up! ©";
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  pointer-events: none;
-  user-select: none;
-  font: 700 48px/1 sans-serif;
-  color: rgba(0,0,0,0.12);
-  transform: rotate(-25deg);
-  letter-spacing: 2px;
-}
-#flipbook { background:#fff; }
-/* Keep FS button pinned in fullscreen */
-#flipbookContainer:fullscreen #fsBtn,
-#flipbookContainer:-webkit-full-screen #fsBtn {
-  position: fixed;
-  top: 12px;
-  right: 12px;
-  z-index: 9999;
-}
-/* Disable printing from this page */
-@media print {
-  body { display: none !important; }
-}
-
+    body{margin:0;display:grid;place-items:center;min-height:100vh;background:#0e0e11;color:#ececf1;font-family:ui-sans-serif,system-ui,-apple-system}
+    .card{width:min(520px,92vw);background:#141419;border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:0 10px 30px rgba(0,0,0,.35);padding:26px;display:grid;gap:12px}
+    h1{font-size:18px;margin:0 0 6px} p{margin:0;color:#9a9aa3}
+    .row{display:grid;grid-template-columns:1fr auto;gap:10px;margin-top:12px}
+    input{padding:12px 14px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:#181820;color:#ececf1;font-size:15px}
+    button{padding:12px 18px;border-radius:14px;font-weight:600;background:linear-gradient(135deg,#e85a8b,#c94d80);border:none;color:white;cursor:pointer}
+    small{color:#9a9aa3}
   </style>
 </head>
 <body>
+  <div class="card">
+    <h1>Enter Bundle Password</h1>
+    <p>Enter the password from your purchase receipt to access your bundle page.</p>
+    <div class="row">
+      <input id="pwd" type="password" placeholder="Password" />
+      <button id="go">Unlock</button>
+    </div>
+    <small id="msg"></small>
+  </div>
+  <script>
+    // From Rae
+    const BUNDLE_PASSWORD = "1*GGUeBook";
+    const SUCCESS_REDIRECT = "/ebook-viewer"; // clean URL to the viewer
 
-  <!-- ACCESS GATE -->
-  <section id="gate">
-  <h2>Enter Access Code</h2>
-  <form method="GET" action="">
-    <input id="accessCodeInput" name="code" placeholder="Enter your unique code" />
-    <button id="unlockButton" type="submit">Unlock Flipbook</button>
-  </form>
-</section>
+    const pwd = document.getElementById('pwd');
+    const btn = document.getElementById('go');
+    const msg = document.getElementById('msg');
 
-
-
-  <div id="flipbookContainer">
-    <button id="fsBtn" style="position:absolute;right:12px;top:12px;z-index:10">Fullscreen</button>
-    <div id="flipbook"></div>
-    <div id="spinner" style="display:none;padding:12px">Loading…</div>
-</div>
-
-
-
-<!-- PDF.js from CDN (must load before PageFlip when using loadFromPDF) -->
-<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.min.js"></script>
-<script>
-  if (window.pdfjsLib) {
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      "https://cdn.jsdelivr.net/npm/pdfjs-dist@2.16.105/build/pdf.worker.min.js";
-  }
-</script>
-
-<!-- PageFlip (browser build) -->
-<script src="https://cdn.jsdelivr.net/npm/page-flip@2.0.7/dist/js/page-flip.browser.min.js"></script>
-
-<!-- Your inline code -->
-<script>
-
-  // --- CONFIG ---
-const CORRECT_CODE = "GGU2025";   // <— live access code
-const ATTEMPT_LIMIT = 5;                   // tries before temporary lock
-const LOCK_SECONDS = 120;                  // lockout duration
-// --------------
-
-// read access code from URL (supports ?access=, ?code=, ?Access=, or #CODE)
-(() => {
-  const u = new URL(location.href);
-  const raw =
-    u.searchParams.get('access') ||
-    u.searchParams.get('code')   ||
-    u.searchParams.get('Access') ||
-    (u.hash ? u.hash.replace(/^#/, '') : '') || '';
-
-  const urlCode = decodeURIComponent(raw).trim();
-  if (urlCode) tryUnlock(urlCode);
-})();
-
-
-// simple state
-let attempts = 0;
-let lockedUntil = 0;
-
-// small helper
-function nowSec(){ return Math.floor(Date.now()/1000); }
-
-function showErr(msg){
-  let box = document.getElementById("errorBox");
-  if(!box){
-    box = document.createElement("div");
-    box.id = "errorBox";
-    box.style.cssText =
-      "position:fixed;left:50%;top:16px;transform:translateX(-50%);" +
-      "max-width:720px;padding:10px 14px;border-radius:8px;" +
-      "background:#fee;color:#a00;border:1px solid #f99;z-index:99999;";
-    document.body.appendChild(box);
-  }
-  box.textContent = msg;
-}
-
-
-async function tryUnlock(inputCode){
-  const t = nowSec();
-  if (t < lockedUntil) {
-    const wait = lockedUntil - t;
-    showErr(`Too many attempts. Try again in ${wait}s.`);
-    return;
-  }
-  if (!inputCode) {
-    document.getElementById('accessCodeInput').focus();
-    return;
-  }
-  if (inputCode !== CORRECT_CODE) {
-    attempts++;
-    if (attempts >= ATTEMPT_LIMIT) {
-      lockedUntil = nowSec() + LOCK_SECONDS;
-      attempts = 0;
-      showErr(`Too many attempts. Locked for ${LOCK_SECONDS}s.`);
-    } else {
-      showErr(`Invalid code. ${ATTEMPT_LIMIT - attempts} attempt(s) left.`);
+    function unlock(){
+      const ok = (pwd.value||'').trim() === BUNDLE_PASSWORD;
+      if(ok){ window.location.href = SUCCESS_REDIRECT; }
+      else { msg.textContent = 'Incorrect password. Try again.'; }
     }
-    return;
-  }
-  // success
-  document.getElementById('gate').style.display = 'none';
-  await initFlipbook();
-}
-
-document.getElementById('unlockButton').addEventListener('click', () => {
-  tryUnlock(document.getElementById('accessCodeInput').value.trim());
-});
-// Ensure Enter key submits the code
-document.getElementById('accessCodeInput').addEventListener('keydown', (e) => {
-  if (e.key === 'Enter') tryUnlock(e.target.value.trim());
-});
-
-
-
-
-   async function pdfReachable(path){
-  try {
-    const r = await fetch(path, { method: 'GET', cache: 'no-store' });
-    return r.ok;
-  } catch { return false; }
-}
-
-async function renderPdfToImages(path){
-  const pdf = await pdfjsLib.getDocument(path).promise;
-  const images = [];
-  for (let i = 1; i <= pdf.numPages; i++) {
-    const page = await pdf.getPage(i);
-    const viewport = page.getViewport({ scale: 2 }); // crisp
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = viewport.width;
-    canvas.height = viewport.height;
-    await page.render({ canvasContext: ctx, viewport }).promise;
-    images.push(canvas.toDataURL('image/png'));
-  }
-  return images;
-}
-
-async function initFlipbook() {
-  const container = document.getElementById('flipbookContainer');
-  const el = document.getElementById('flipbook');
-  const spinner = document.getElementById('spinner');
-const PDF_PATH = '/pdf/Girl-Get-Up-Flipbook.pdf';
-
-
-  // (No pre-check, let loadFromPDF handle errors)
-
-
-  container.style.display = 'block';
-  spinner.style.display = 'block';
-
-  const width  = el.clientWidth;
-  const height = el.clientHeight;
-
-  const flip = new St.PageFlip(el, {
-    width, height,
-    size: 'stretch',
-    minWidth: 315, maxWidth: 2000,
-    minHeight: 400, maxHeight: 2000,
-    showCover: true,
-    drawShadow: true,
-    flippingTime: 800,
-    mobileScrollSupport: false,
-    useMouseEvents: true,
-    disableFlipByClick: false,
-    showPageCorners: true,
-    useKeyboard: true,
-    responsive: true
-  });
-
- // NEW
-try {
-  // 1) Render PDF pages to data-URL strings
-  const srcs = await renderPdfToImages(PDF_PATH);
-  if (!srcs.length) throw new Error('No pages rendered from PDF');
-
-  // 2) Turn those strings into real <img> elements
-  const images = srcs.map((src) => {
-    const img = new Image();
-    img.src = src;
-    img.draggable = false;
-    img.loading = 'eager';
-    img.style.width = '100%';
-    img.style.height = 'auto';
-    return img;
-  });
-
-  // 3) Load into PageFlip
-  await flip.loadFromImages(images);
-} catch (e) {
-  showErr('Failed to load PDF: ' + e.message);
-} finally {
-  spinner.style.display = 'none';
-}
-
-
-
-
-document.getElementById('fsBtn')?.addEventListener('click', () => {
-  const el = document.getElementById('flipbookContainer');
-  if (!document.fullscreenElement) {
-    el.requestFullscreen?.();
-  } else {
-    document.exitFullscreen?.();
-  }
-});
-// Block right-click menu
-document.addEventListener('contextmenu', (e) => e.preventDefault());
-
-// Block common “save/print/view-source” shortcuts
-document.addEventListener('keydown', (e) => {
-  const k = e.key.toLowerCase();
-  const meta = e.metaKey || e.ctrlKey;
-  if (
-    (meta && (k === 'p' || k === 's' || k === 'u' || k === 'o')) || // Cmd/Ctrl+P/S/U/O
-    (e.shiftKey && meta && (k === 'i' || k === 'j' || k === 'c'))   // Devtools combos
-  ) {
-    e.preventDefault();
-    e.stopPropagation();
-  }
-});
-
-// Block dragging images/canvas
-document.addEventListener('dragstart', (e) => e.preventDefault());
-
+    btn.addEventListener('click', unlock);
+    pwd.addEventListener('keydown', (e)=>{ if(e.key==='Enter') unlock(); });
   </script>
-
 </body>
 </html>
-
-
