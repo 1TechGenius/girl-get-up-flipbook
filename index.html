@@ -21,7 +21,11 @@
 <div class="wrap">
   <header>Gia Blessings — eBook Viewer</header>
   <div class="stage">
-    <iframe id="pdf" class="pdf" title="Girl, Get Up! eBook" loading="eager"></iframe>
+    <!-- Canvas-based viewer (no native PDF UI) -->
+<div id="pdf_stage" class="pdf" style="display:grid;place-items:center;background:#fff;">
+  <canvas id="pdf_canvas"></canvas>
+</div>
+
     <div id="gate" class="gate" role="dialog" aria-modal="true">
       <div class="card">
         <h2>Enter Access Code</h2>
@@ -35,19 +39,73 @@
     </div>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.min.js"></script>
+<script>
+  if (window['pdfjsLib']) {
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/pdf.worker.min.js";
+  }
+</script>
 
 <script>
   const ACCESS_CODE = "GGU2025"; // case-sensitive
   const EBOOK_URL   = "/pdf/Girl-Get-Up-eBook.pdf#toolbar=0&navpanes=0&scrollbar=0";
+<script>
+  let _pdfDoc = null;
+  let _pageNum = 1;
+  let _scale = 1.2;
+
+  async function renderPage(num){
+    const canvas = document.getElementById('pdf_canvas');
+    const ctx = canvas.getContext('2d');
+
+    const page = await _pdfDoc.getPage(num);
+    const viewport = page.getViewport({ scale: _scale });
+
+    // High-DPI rendering (sharp on phones)
+    const dpr = window.devicePixelRatio || 1;
+    canvas.width = Math.floor(viewport.width * dpr);
+    canvas.height = Math.floor(viewport.height * dpr);
+    canvas.style.width = Math.floor(viewport.width) + 'px';
+    canvas.style.height = Math.floor(viewport.height) + 'px';
+
+    await page.render({ canvasContext: ctx, viewport, transform: [dpr,0,0,dpr,0,0] }).promise;
+  }
+
+  async function initPDFCanvas(){
+    // Load the PDF file (same EBOOK_URL you already use)
+    _pdfDoc = await pdfjsLib.getDocument({ url: EBOOK_URL }).promise;
+
+    // Fit the first page to the container width
+    const stage = document.getElementById('pdf_stage');
+    const first = await _pdfDoc.getPage(1);
+    const base = first.getViewport({ scale: 1 });
+    const stageWidth = stage.clientWidth || 900;
+    _scale = stageWidth / base.width;
+
+    await renderPage(_pageNum);
+
+    // Optional UX: re-render on resize for a snug fit
+    window.addEventListener('resize', () => { renderPage(_pageNum); });
+  }
+
+  // 🔁 Change only the success path in your gate:
+  // Find your tryUnlock(...) and replace the success branch with the 2 lines below.
+  // Everything else stays the same.
+  //   if (ok) { hideGate(); initPDFCanvas(); return true; }
+
+</script>
 
   function openBook(){ document.getElementById('pdf').src = EBOOK_URL; }
   function hideGate(){ const g=document.getElementById('gate'); if(g) g.style.display='none'; }
-  function tryUnlock(raw){
-    const ok = (raw||"") === ACCESS_CODE;
-    if(ok){ hideGate(); openBook(); return true; }
-    const msg=document.getElementById('gate_msg'); if(msg) msg.textContent="Invalid code. Try again.";
-    return false;
-  }
+ function tryUnlock(raw){
+  const ok = (raw||"") === ACCESS_CODE;
+  if(ok){ hideGate(); initPDFCanvas(); return true; }
+  const msg=document.getElementById('gate_msg'); if(msg) msg.textContent="Invalid code. Try again.";
+  return false;
+}
+
+
 
   document.addEventListener('DOMContentLoaded', () => {
     const input=document.getElementById('code_input'); const btn=document.getElementById('unlock_btn');
@@ -57,4 +115,58 @@
       setTimeout(()=>{ try{ input.focus(); }catch{} }, 50);
     }
   });
+  /* === auto-fill + unlock via buyer token === */
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbyl5s0gYso8Yz3Q3-RbpK_z--GR12PwGuVYP01sIXIDCXjB17PrGFRDx7DfuUT1lSXc/exec';
+
+  function proceed(token) {
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d.ok) return; // invalid/expired
+
+        // find the code box (best guess)
+        var codeInput =
+          document.querySelector('#code') ||
+          document.querySelector('#access-code') ||
+          document.querySelector('input[name*="code" i]') ||
+          document.querySelector('input[id*="code" i]') ||
+          document.querySelector('input[placeholder*="code" i]') ||
+          document.querySelector('form input[type="text"]');
+
+        if (codeInput) {
+          codeInput.value = d.code || '';
+          codeInput.dispatchEvent(new Event('input', { bubbles: true }));
+          codeInput.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        // click Unlock/Open/Continue
+        var unlockBtn = Array.from(document.querySelectorAll('button, input[type="submit"], [role="button"]'))
+          .find(function (el) {
+            var t = (el.textContent || el.value || '').toLowerCase();
+            return /unlock|open|continue|submit/.test(t);
+          });
+        if (unlockBtn) unlockBtn.click();
+      })
+      .catch(function(){});
+  }
+
+  // 1) token in this page's URL
+  var token = new URLSearchParams(location.search).get('token');
+  if (token) { window.addEventListener('load', function(){ proceed(token); }); }
+
+  // 2) token sent from the Hostinger page (recommended)
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) proceed(ev.data.token);
+  }, { once: true });
+
+  // 3) fallback: try referrer (may be trimmed by browser)
+  if (!token && document.referrer) {
+    try {
+      var t2 = new URLSearchParams(new URL(document.referrer).search).get('token');
+      if (t2) { window.addEventListener('load', function(){ proceed(t2); }); }
+    } catch (e) {}
+  }
+})();
+
 </script>
