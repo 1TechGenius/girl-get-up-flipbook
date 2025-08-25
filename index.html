@@ -222,4 +222,47 @@
     if (ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) proceed(ev.data.token);
   }, { once: true });
 })();
+/* === force-fill using known IDs: #code_input + #unlock_btn === */
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbyl5s0gYso8Yz3Q3-RbpK_z--GR12PwGuVYP01sIXIDCXjB17PrGFRDx7DfuUT1lSXc/exec';
+
+  function proceed(token) {
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(r => r.json())
+      .then(d => {
+        if (!d.ok) return;
+
+        var input = document.getElementById('code_input') ||
+                    document.querySelector('input[placeholder="Access code"]');
+        if (input) {
+          input.value = d.code || '';
+          input.dispatchEvent(new Event('input', { bubbles: true }));
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        }
+
+        var btn = document.getElementById('unlock_btn') ||
+                  Array.from(document.querySelectorAll('button, input[type="submit"], [role="button"]'))
+                    .find(el => (el.textContent || el.value || '').trim().toLowerCase() === 'unlock');
+
+        setTimeout(function(){ if (btn) btn.click(); }, 120);
+      })
+      .catch(() => {});
+  }
+
+  function getToken() {
+    var t = new URLSearchParams(location.search).get('token');
+    if (t) return t;
+    try { return new URLSearchParams(new URL(document.referrer).search).get('token'); } catch (e) {}
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    var t = getToken();
+    if (t) proceed(t);
+  });
+
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) proceed(ev.data.token);
+  });
+})();
+
 </script>
