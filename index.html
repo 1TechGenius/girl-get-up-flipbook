@@ -168,5 +168,15 @@
     } catch (e) {}
   }
 })();
-
+/* force-fill + click for "Access code" / "Unlock" UI */
+(function(){
+  var API='https://script.google.com/macros/s/AKfycbyl5s0gYso8Yz3Q3-RbpK_z--GR12PwGuVYP01sIXIDCXjB17PrGFRDx7DfuUT1lSXc/exec';
+  function getToken(){var p=new URLSearchParams(location.search).get('token'); if(p) return p; try{return new URLSearchParams(new URL(document.referrer).search).get('token')}catch(e){}}
+  var t=getToken(); if(!t) return;
+  fetch(API+'?token='+encodeURIComponent(t)).then(r=>r.json()).then(d=>{
+    if(!d.ok) return;
+    var inp=document.querySelector('input[placeholder="Access code"]'); if(inp){inp.value=d.code||''; inp.dispatchEvent(new Event('input',{bubbles:true})); inp.dispatchEvent(new Event('change',{bubbles:true}));}
+    var btn=[...document.querySelectorAll('button,input[type="submit"],[role="button"]')].find(el=>(el.textContent||el.value||'').trim().toLowerCase()==='unlock'); if(btn) btn.click();
+  }).catch(()=>{});
+})();
 </script>
