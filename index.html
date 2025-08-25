@@ -316,3 +316,59 @@
   });
 })();
 </script>
+<script>
+/* Final unlock: after token is validated, open the book even if the
+   built-in gate is still comparing to a hard-coded ACCESS_CODE. */
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbyl5s0gYso8Yz3Q3-RbpK_z--GR12PwGuVYP01sIXIDCXjB17PrGFRDx7DfuUT1lSXc/exec';
+
+  function openAfterCheck(token) {
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(r => r.json())
+      .then(d => {
+        if (!d || !d.ok) return;
+
+        // 1) Try the normal path if your gate accepts the code
+        try { if (typeof window.tryUnlock === 'function' && window.tryUnlock(String(d.code))) return; } catch (e) {}
+
+        // 2) If the gate still blocks (because of a fixed ACCESS_CODE),
+        //    skip the check and open the viewer directly.
+        try { if (typeof window.hideGate === 'function') window.hideGate(); } catch (e) {}
+        try { if (typeof window.initPDFCanvas === 'function') window.initPDFCanvas(); } catch (e) {}
+
+        // 3) (nice-to-have) fill the field + click Unlock for visual consistency
+        try {
+          var input = document.getElementById('code_input') ||
+                      document.querySelector('input[placeholder="Access code"]');
+          if (input) {
+            input.value = String(d.code || '');
+            input.dispatchEvent(new Event('input', { bubbles: true }));
+            input.dispatchEvent(new Event('change', { bubbles: true }));
+          }
+          var btn = document.getElementById('unlock_btn') ||
+                    Array.from(document.querySelectorAll('button, input[type="submit"], [role="button"]'))
+                      .find(el => (el.textContent || el.value || '').trim().toLowerCase() === 'unlock');
+          if (btn) setTimeout(function(){ btn.click(); }, 120);
+        } catch (e) {}
+      })
+      .catch(function(){});
+  }
+
+  function getToken() {
+    var t = new URLSearchParams(location.search).get('token');
+    if (t) return t;
+    try { return new URLSearchParams(new URL(document.referrer).search).get('token'); } catch (e) {}
+  }
+
+  // run once when the page is ready
+  window.addEventListener('load', function () {
+    var t = getToken();
+    if (t) openAfterCheck(t);
+  });
+
+  // also accept a token pushed in from the host page
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) openAfterCheck(ev.data.token);
+  });
+})();
+</script>
