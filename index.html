@@ -463,3 +463,46 @@
   }, true);
 })();
 </script>
+<script>
+(function () {
+  // 1) Your live Apps Script Web App URL (the one that returns {"ok":true,...})
+  const API = 'https://script.google.com/macros/s/PASTE_YOUR_DEPLOYED_EXEC_ID/exec';
+
+  // 2) Helpers
+  function qs(k){ try { return new URLSearchParams(location.search).get(k); } catch(e){ return null; } }
+  function fillAndClick(code){
+    // Try common selectors used on your gate
+    const input = document.querySelector('#code_input, input[placeholder="Access code"], input[type="password"]');
+    const btn   = document.querySelector('#unlock_btn, button[role="button"], button');
+    if (!input) return;
+    input.value = String(code);
+    input.dispatchEvent(new Event('input', { bubbles:true }));
+    setTimeout(() => { if (btn) btn.click(); }, 60); // click Unlock
+  }
+
+  // 3) Call the sheet API with ?token=...
+  function checkToken(token){
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(r => r.json())
+      .then(j => {
+        if (j && j.ok && j.code) fillAndClick(j.code);
+        else console.warn('Token failed:', j);
+      })
+      .catch(err => console.error('Token fetch error:', err));
+  }
+
+  // 4) Run when token is present in URL or posted from host page
+  const t = qs('token');
+  if (t) {
+    if (document.readyState === 'complete') checkToken(t);
+    else window.addEventListener('load', () => checkToken(t));
+  }
+
+  // also accept token via postMessage from a parent page (Hostinger page)
+  window.addEventListener('message', (ev) => {
+    if (ev && ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) {
+      checkToken(ev.data.token);
+    }
+  });
+})();
+</script>
