@@ -506,3 +506,44 @@
   });
 })();
 </script>
+<script>
+(function () {
+  // 1) REPLACE this with your Apps Script Web app URL (the one that ends with /exec)
+  var API = 'PASTE_YOUR_WEB_APP_URL_HERE'; 
+
+  function getParam(name){ try{ return new URLSearchParams(location.search).get(name)||''; }catch(e){ return ''; } }
+  var token = getParam('token');
+  if (!token) return;  // no token in the URL? nothing to do
+
+  function fillAndClick(code){
+    // Find the input and the Unlock button on the page in a robust way
+    var input = document.querySelector('input[placeholder*="Access code" i], input#code_input, input[name="code"], input[type="password"]');
+    var btn   = document.querySelector('button#unlock_btn, button[type="submit"], button');
+    if (!input || !btn) return;
+
+    input.focus();
+    input.value = code;
+    // make frameworks notice the value
+    input.dispatchEvent(new Event('input', {bubbles:true}));
+    input.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true}));
+    setTimeout(function(){ btn.click(); }, 120);
+  }
+
+  function unlockWith(code){
+    try { if (typeof tryUnlock === 'function') { tryUnlock(code); return; } } catch(e){}
+    fillAndClick(code);
+  }
+
+  window.addEventListener('load', function(){
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (!j || !j.ok) return;              // gate didn’t validate the token
+        var code = String(j.code||'').trim(); // e.g. 231503
+        if (!code) return;
+        unlockWith(code);
+      })
+      .catch(function(){ /* ignore */ });
+  });
+})();
+</script>
