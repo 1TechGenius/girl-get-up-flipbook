@@ -547,3 +547,58 @@
   });
 })();
 </script>
+<script>
+/* === Auto-open after token check (no UI clicks needed) === */
+(function () {
+  // 1) PUT YOUR APPS SCRIPT WEB APP URL (ends with /exec)
+  var API = 'PASTE_YOUR_WEB_APP_URL_HERE';
+
+  // 2) Your PDF path (fallback if the page doesn't have window.EBOOK_URL)
+  var PDF_URL = (typeof EBOOK_URL === 'string' && EBOOK_URL) ||
+                '/pdf/Girl-Get-Up-eBook.pdf#toolbar=0&navpanes=0&scrollbar=0';
+
+  function qs(sel){ return document.querySelector(sel); }
+  function getParam(k){ try{ return new URLSearchParams(location.search).get(k)||''; }catch(e){ return ''; } }
+
+  function hideGate(){
+    var ids = ['gate','gba_gate','ebook_gate'];
+    ids.forEach(function(id){ var el = document.getElementById(id); if (el) el.style.display='none'; });
+    var byText = Array.from(document.querySelectorAll('div,section,form')).find(function(n){
+      return /enter access code/i.test(n.textContent||'');
+    });
+    if (byText) byText.style.display='none';
+  }
+
+  function openPdfNow(){
+    var frame = document.getElementById('pdf') || qs('iframe#pdf');
+    if (frame) { frame.src = PDF_URL; return; }
+    try { if (typeof openBook === 'function') { openBook(); return; } } catch(e){}
+    var wrap = document.getElementById('pdf_wrap') || document.body;
+    var iframe = document.createElement('iframe');
+    iframe.id = 'pdf';
+    iframe.style.cssText = 'display:block;width:100%;height:100vh;border:0;margin:0 auto;';
+    iframe.src = PDF_URL;
+    wrap.appendChild(iframe);
+  }
+
+  function proceedAfterCheck(){
+    hideGate();
+    try { if (typeof initPDFCanvas === 'function') { initPDFCanvas(); return; } } catch(e){}
+    openPdfNow();
+  }
+
+  var token = getParam('token');
+  if (!token) return;
+
+  window.addEventListener('load', function(){
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(function(r){ return r.json(); })
+      .then(function(j){
+        if (!j || !j.ok) return;
+        try { localStorage.setItem('gba_token_ok','1'); } catch(e){}
+        proceedAfterCheck();
+      })
+      .catch(function(){});
+  });
+})();
+</script>
