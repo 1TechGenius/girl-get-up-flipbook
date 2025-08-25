@@ -266,3 +266,53 @@
 })();
 
 </script>
+<script>
+/* Final patch: fetch code by token → call tryUnlock(code),
+   and if that isn't available, fill the "Access code" field and click "Unlock". */
+(function () {
+  var API = 'https://script.google.com/macros/s/AKfycbyl5s0gYso8Yz3Q3-RbpK_z--GR12PwGuVYP01sIXIDCXjB17PrGFRDx7DfuUT1lSXc/exec';
+
+  function unlockWith(code) {
+    if (!code) return;
+    if (typeof window.tryUnlock === 'function') {        // preferred: use your existing function
+      try { window.tryUnlock(String(code)); return; } catch (e) {}
+    }
+    // fallback: fill + click
+    var input = document.getElementById('code_input') ||
+                document.querySelector('input[placeholder="Access code"]');
+    if (input) {
+      input.value = String(code);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      input.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+    var btn = document.getElementById('unlock_btn') ||
+              Array.from(document.querySelectorAll('button, input[type="submit"], [role="button"]'))
+                .find(el => (el.textContent || el.value || '').trim().toLowerCase() === 'unlock');
+    if (btn) setTimeout(() => btn.click(), 120);
+  }
+
+  function proceed(token) {
+    fetch(API + '?token=' + encodeURIComponent(token))
+      .then(r => r.json())
+      .then(d => { if (d && d.ok) unlockWith(d.code); })
+      .catch(() => {});
+  }
+
+  function getToken() {
+    var t = new URLSearchParams(location.search).get('token');
+    if (t) return t;
+    try { return new URLSearchParams(new URL(document.referrer).search).get('token'); } catch (e) {}
+  }
+
+  // run after DOM is up
+  window.addEventListener('load', function () {
+    var t = getToken();
+    if (t) proceed(t);
+  });
+
+  // also accept token sent from host page
+  window.addEventListener('message', function (ev) {
+    if (ev.data && ev.data.type === 'GBA_TOKEN' && ev.data.token) proceed(ev.data.token);
+  });
+})();
+</script>
