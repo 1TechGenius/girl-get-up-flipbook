@@ -390,3 +390,24 @@
   };
 })();
 </script>
+<script>
+/* Simple, reliable gate override: accept one rotating code you control */
+(function () {
+  var DAILY_CODE = '654321'; // change anytime to rotate the code
+
+  // Make it visible to any existing checks
+  window.ACCESS_CODE = DAILY_CODE;
+
+  // Replace/override the viewer's gate with a simple compare → open
+  window.tryUnlock = function (c) {
+    var ok = String(c || '').trim() === String(DAILY_CODE);
+    if (!ok) return false;
+
+    try { if (typeof hideGate === 'function') hideGate(); } catch(e){}
+    try { if (typeof initPDFCanvas === 'function') initPDFCanvas(); } catch(e){}
+    try { if (typeof openBook === 'function') openBook(); } catch(e){}
+
+    return true;
+  };
+})();
+</script>
