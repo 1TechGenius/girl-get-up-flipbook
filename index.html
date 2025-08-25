@@ -411,3 +411,55 @@
   };
 })();
 </script>
+<script>
+(function () {
+  var DAILY_CODE = '654321'; // change anytime to rotate
+  window.ACCESS_CODE = DAILY_CODE;
+  window.tryUnlock = function (c) {
+    var ok = String(c||'').trim() === DAILY_CODE;
+    if (!ok) return false;
+    try { hideGate && hideGate(); } catch(e){}
+    try { initPDFCanvas && initPDFCanvas(); } catch(e){}
+    try { openBook && openBook(); } catch(e){}
+    return true;
+  };
+})();
+</script>
+<script>
+/* Open the book when code = 654321, without relying on the old gate */
+(function () {
+  var DAILY_CODE = '654321'; // change this anytime
+
+  function openNow() {
+    // hide any “gate” overlay if present
+    try { document.querySelectorAll('[id*="gate" i],[class*="gate" i]').forEach(el => el.style.display = 'none'); } catch (e) {}
+    // call any built-in open routines if they exist
+    try { if (typeof hideGate === 'function') hideGate(); } catch (e) {}
+    try { if (typeof initPDFCanvas === 'function') initPDFCanvas(); } catch (e) {}
+    try { if (typeof openBook === 'function') openBook(); } catch (e) {}
+  }
+
+  // 1) Support a direct link like ?code=654321
+  var qs = new URLSearchParams(location.search);
+  var linkCode = (qs.get('code') || '').trim();
+  if (linkCode === DAILY_CODE) { openNow(); }
+
+  // 2) Intercept the Unlock button and handle it ourselves
+  document.addEventListener('click', function (ev) {
+    var btn = ev.target && ev.target.closest('button, input[type="submit"], [role="button"]');
+    if (!btn) return;
+    var label = (btn.textContent || btn.value || '').trim().toLowerCase();
+    if (label !== 'unlock') return;
+
+    var input = document.getElementById('code_input') ||
+                document.querySelector('input[placeholder="Access code"]');
+    var val = (input && input.value || '').trim();
+
+    if (val === DAILY_CODE) {
+      ev.preventDefault();
+      openNow();
+    }
+    // if the code is wrong, do nothing — the page’s own message will show
+  }, true);
+})();
+</script>
