@@ -13,38 +13,36 @@
 <body>
   <div class="c" id="msg">Checking your access…</div>
   <script>
-  (function(){
-    // 1) Your Apps Script Web App URL (ends with /exec)
-    const API = 'https://script.google.com/macros/s/AKfycbyb9RJ-SJsVyi8-l5ByoKgTUuvHrJRA6zbycTx4yn0gmfwkSRD_MUtE8F6ZN__B4jCf/exec';
+(function () {
+  // 1) Apps Script Web App URL (no token here)
+  const API = 'https://script.google.com/macros/s/AKfycbyb9RJ-SJsVyi8-l5ByoKgTUuvHrJRA6zbycTx4yn0gmfwkSRD_MUtE8F6ZN__B4jCf/exec';
 
-    // 2) Your PDF path on this Vercel project (adjust if your filename differs)
-    var PDF = '/pdf/Girl-Get-Up-eBook.pdf#toolbar=0&navpanes=0&scrollbar=0';
+  // 2) Your PDF path on Vercel
+  const PDF = '/pdf/Girl-Get-Up-eBook.pdf#toolbar=0&navpanes=0&scrollbar=0';
 
-    function p(k){try{return new URLSearchParams(location.search).get(k)||''}catch(e){return''}}
-    var token = p('token');
+  // helper to show a message
+  function show(msg){ 
+    const el = document.getElementById('msg') || document.body.appendChild(Object.assign(document.createElement('div'),{id:'msg'}));
+    el.textContent = msg;
+  }
 
-    if (!token) {
-      document.getElementById('msg').textContent = 'Missing token.';
-      return;
-    }
+  // get token from page URL
+  const token = new URLSearchParams(location.search).get('token') || '';
+  if (!token) { show('Missing token.'); return; }
 
-    fetch(API + '?token=' + encodeURIComponent(token))
-      .then(r => r.json())
-      .then(j => {
-        if (!j || !j.ok) {
-          document.getElementById('msg').textContent = 'Access denied or expired.';
-          return;
-        }
-        // Valid → show the PDF
-        document.body.innerHTML = '';
-        var f = document.createElement('iframe');
-        f.src = PDF;
-        document.body.appendChild(f);
-      })
-      .catch(() => {
-        document.getElementById('msg').textContent = 'Network error. Try again.';
-      });
-  })();
-  </script>
-</body>
-</html>
+  // call the gate with the token
+  fetch(`${API}?token=${encodeURIComponent(token)}&cb=${Date.now()}`, { cache: 'no-store' })
+    .then(r => r.json())
+    .then(data => {
+      if (!data || !data.ok) { show('Access denied or expired.'); return; }
+
+      // valid → render the PDF
+      show(''); // clear message
+      const iframe = document.createElement('iframe');
+      iframe.src = PDF;
+      iframe.style.cssText = 'position:fixed;inset:0;border:0;width:100%;height:100vh';
+      document.body.appendChild(iframe);
+    })
+    .catch(() => show('Network error. Try again.'));
+})();
+</script>
